@@ -2,9 +2,10 @@ import std.stdio;
 import std.file;
 import std.datetime;
 
-import context.init;
+import utils.meta;
+import utils.io;
+import utils.exception;
 import context.io;
-import context.exception;
 import context.calc;
 import context.text;
 
@@ -44,4 +45,19 @@ void main(string[] args){
             }
         }
     }
+}
+
+auto debugSpace(Text target){
+    string[] text;
+    foreach(Sentence s;target.sentences){
+        foreach(Phrase p;s.phrases){
+            foreach(Word w;p.words){
+                text~=w.morpheme;
+            }
+        }
+    }
+    foreach(string s;text){
+        s.write;
+    }
+    "\n".write;
 }

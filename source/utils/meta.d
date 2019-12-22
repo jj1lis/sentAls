@@ -1,9 +1,8 @@
-module context.init;
+module utils.meta;
 
 import std.datetime;
 
-import context.io;
-
+import utils.io;
 
 struct Meta{
     private SysTime start;
