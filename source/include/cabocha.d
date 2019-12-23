@@ -163,5 +163,141 @@ int cabocha_model_index (int argc, char** argv);
 
 /* for C++ */
 
+extern (C++,CaboCha):
+struct Chunk;
+struct Token;
+
+enum CharsetType {
+  EUC_JP = CABOCHA_EUC_JP,
+  CP932  = CABOCHA_CP932,
+  UTF8   = CABOCHA_UTF8,
+  ASCII  = CABOCHA_ASCII
+};
+
+enum PossetType  {
+  IPA    = CABOCHA_IPA,
+  JUMAN  = CABOCHA_JUMAN,
+  UNIDIC = CABOCHA_UNIDIC
+}
+
+enum FormatType {
+  FORMAT_TREE         = CABOCHA_FORMAT_TREE,
+  FORMAT_LATTICE      = CABOCHA_FORMAT_LATTICE,
+  FORMAT_TREE_LATTICE = CABOCHA_FORMAT_TREE_LATTICE,
+  FORMAT_XML          = CABOCHA_FORMAT_XML,
+  FORMAT_CONLL        = CABOCHA_FORMAT_CONLL,
+  FORMAT_NONE         = CABOCHA_FORMAT_NONE
+}
+
+enum InputLayerType {
+  INPUT_RAW_SENTENCE = CABOCHA_INPUT_RAW_SENTENCE,
+  INPUT_POS          = CABOCHA_INPUT_POS,
+  INPUT_CHUNK        = CABOCHA_INPUT_CHUNK,
+  INPUT_SELECTION    = CABOCHA_INPUT_SELECTION,
+  INPUT_DEP          = CABOCHA_INPUT_DEP
+}
+
+enum OutputLayerType {
+  OUTPUT_RAW_SENTENCE = CABOCHA_OUTPUT_RAW_SENTENCE,
+  OUTPUT_POS          = CABOCHA_OUTPUT_POS,
+  OUTPUT_CHUNK        = CABOCHA_OUTPUT_CHUNK,
+  OUTPUT_SELECTION    = CABOCHA_OUTPUT_SELECTION,
+  OUTPUT_DEP          = CABOCHA_OUTPUT_DEP
+}
+
+enum ParserType {
+  TRAIN_NE    = CABOCHA_TRAIN_NE,
+  TRAIN_CHUNK = CABOCHA_TRAIN_CHUNK,
+  TRAIN_DEP   = CABOCHA_TRAIN_DEP
+}
+
+class TreeAllocator;
+class Tree {
+ public:
+  void set_sentence(const char *sentence);
+  const char *sentence();
+  size_t sentence_size();
+
+  void set_sentence(const char *sentence, size_t length);
+
+  const Chunk *chunk(size_t i);
+  const Token *token(size_t i);
+
+  Chunk *mutable_chunk(size_t i);
+  Token *mutable_token(size_t i);
+
+  Token *add_token();
+  Chunk *add_chunk();
+
+  char *strdup(const char *str);
+  char *alloc(size_t size);
+  char **alloc_char_array(size_t size);
+
+  TreeAllocator *allocator() const;
+
+  bool   read(const char *input,
+              InputLayerType input_layer);
+
+  bool   read(const char *input, size_t length,
+              InputLayerType input_layer);
+  bool   read(const mecab_node_t *node);
+
+  bool   empty() const;
+  void   clear();
+  void   clear_chunk();
+
+  size_t chunk_size() const;
+  size_t token_size() const;
+  size_t size() const;
+
+  const char *toString(FormatType output_format);
+
+  const char *toString(FormatType output_format,
+                       char *output, size_t length);
+
+  CharsetType charset() const { return charset_; }
+  void set_charset(CharsetType charset) { charset_ = charset; }
+  PossetType posset() const { return posset_; }
+  void set_posset(PossetType posset) { posset_ = posset; }
+  OutputLayerType output_layer() const { return output_layer_; }
+  void set_output_layer(OutputLayerType output_layer) { output_layer_ = output_layer; }
+
+  const char *what();
+
+  this();
+  ~this();
+
+ private:
+  TreeAllocator              *tree_allocator_;
+  CharsetType                 charset_;
+  PossetType                  posset_;
+  OutputLayerType             output_layer_;
+}
+
+class Parser {
+ public:
+  const Tree *parse(const char *input)                          = 0;
+  const char *parseToString(const char *input)                  = 0;
+  const Tree *parse(Tree *tree)                           = 0;
+
+  const Tree *parse(const char *input, size_t length)           = 0;
+  const char *parseToString(const char *input, size_t length)   = 0;
+  const char *parseToString(const char *input, size_t length,
+                                    char       *output, size_t output_length) = 0;
+
+  const char *what() = 0;
+  static char *version_();
+
+  ~this();
+
+  static Parser *create(int argc, char **argv);
+  static Parser *create(const char *arg);
+}
+
+
+Parser *createParser(int argc, char **argv);
+Parser *createParser(const char *arg);
+char *getParserError();
+char *getLastError();
 // API for training
 
