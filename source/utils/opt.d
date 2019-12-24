@@ -1,8 +1,17 @@
 module utils.opt;
 
+import std.stdio;
+import std.datetime;
+
+import utils.exception;
+import utils.meta;
+import utils.io;
+
 enum Opt{
-    file,
     text,
+    inputfile,
+    outputfile,
+    help,
     unknown,
 }
 
@@ -24,8 +33,8 @@ struct Option{
 Option[] separateOption(string[] args){
     string[] tmp_arg;
     Option[] options;
+    Opt opt=args[0].argToOption==Opt.unknown?Opt.unknown:args[0].argToOption;
     foreach(arg;args){
-        Opt opt;
         if(arg.argToOption!=Opt.unknown){
             if(tmp_arg.length!=0){
                 options~=Option(opt,tmp_arg);
@@ -38,17 +47,67 @@ Option[] separateOption(string[] args){
             tmp_arg~=arg;
         }
     }
+    options~=Option(opt,tmp_arg);
     return options;
 }
 
 Opt argToOption(string arg){
     switch(arg){
-        case "-f":
-            return Opt.file;
         case "-t":
             return Opt.text;
-        //
+        case "-i":
+            return Opt.inputfile;
+        case "-o":
+            return Opt.outputfile;
+        case "-h":
+            return Opt.help;
+            //
         default:
             return Opt.unknown;
     }
+}
+
+void excecute(Option[] opts){
+    string[] texts;
+    string[] inputfiles;
+    string outputfile;
+    foreach(opt;opts){
+        switch(opt.option){
+            case Opt.unknown:
+                throw new ArgumentException("Unknown Option.");
+            case Opt.text:
+                if(opt.arg.length==0){
+                    throw new ArgumentException("-t: Specify text.");
+                }else{
+                    texts~=opt.arg;
+                }
+                break;
+            case Opt.inputfile:
+                if(opt.arg.length==0){
+                    throw new ArgumentException("-i: Specify input filename.");
+                }else{
+                    foreach(file;opt.arg){
+                        texts~=file.devideFileByLine;
+                    }
+                }
+                break;
+            case Opt.outputfile:
+                if(opt.arg.length==0){
+                    throw new ArgumentException("-o: Specify output filename.");
+                }else if(opt.arg.length>1){
+                    throw new ArgumentException("-o: Too many arguments.");
+                }else{
+                    outputfile=opt.arg[0];
+                }
+                break;
+            case Opt.help:
+                throw new Termination(help);
+            default:
+        }
+    }
+    meta=Meta(Clock.currTime,texts,outputfile);
+}
+
+string help(){
+    return "help!";
 }

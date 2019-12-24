@@ -97,7 +97,7 @@ class ScoreException:Exception{
     }
 }
 
-class ArgumentNumberException:Exception{
+class ArgumentException:Exception{
     this(string reason){
         super("Invalid argument: "~reason~".");
     }
@@ -132,5 +132,14 @@ class ElementEmptyException:Exception{
             ", phrase "~to!string(phrase)~", sentence "~to!string(sentence)~
             ", in text "~to!string(text);
         super(msg~cursor);
+    }
+}
+
+class Termination:Exception{
+    private bool failure;
+    @property bool isfailure(){return failure;}
+    this(string msg,bool failure=false){
+        this.failure=failure;
+        super(msg);
     }
 }

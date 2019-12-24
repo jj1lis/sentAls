@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/sentals
+sentals.so
+sentals.dylib
+sentals.dll
+sentals.a
+sentals.lib
+sentals-test-*
+*.exe
+*.o
+*.obj
+*.lst

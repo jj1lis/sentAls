@@ -15,10 +15,10 @@ char* analyzeCaboCha(const char* sentence){
     vector<string> element;
     int cnt=0;
     try{
-        CaboCha::Parser* parser=CaboCha::createParser("");
-        const CaboCha::Tree *tree=parser->parse(const_cast<char*>(sentence));
+        auto parser=CaboCha::createParser("");
+        auto tree=parser->parse(const_cast<char*>(sentence));
         for(unsigned int i=0;i<tree->size();i++){
-            const CaboCha::Token *token=tree->token(i);
+            auto token=tree->token(i);
             if(token->chunk){
                 element.push_back("$");
                 element.push_back(to_string(token->chunk->link));
@@ -44,7 +44,7 @@ char* analyzeCaboCha(const char* sentence){
     }
     return result;
 }
-
+//
 //int main(){
 //    cout<<analyzeCaboCha("こんばんは、だいぶ寒いですね。")<<endl;
 //    //cout<<str<<endl;
