@@ -5,14 +5,18 @@ import core.stdcpp.string;
 import std.string;
 import std.conv;
 
+alias cpp_string=basic_string!(char);
+
 extern(C++){
-    vector!(basic_string!char) analyzeCaboCha(basic_string!char sentence);
+    vector!(cpp_string) analyzeCaboCha(cpp_string sentence);
 }
 
-string[] analyzeDependency(string sentence){
+string[] analyzeDependency(string sent){
     string[] elements;
-    auto cabocha=basic_string(sentence.toStringz).analyzeCaboCha;
+    auto sentence=cpp_string(sent);
+    auto cabocha=sentence.analyzeCaboCha;
     foreach(ele;cabocha){
-        element~=ele.to!string;
+        elements~=ele.data.to!string;
     }
+    return elements;
 }

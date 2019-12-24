@@ -11,23 +11,23 @@ const char* getBase(const CaboCha::Token* token) {
     return token->surface;
 }
 
-const char** analyzeCaboCha(char* sentence){
-        const char[100] *element;
-        int cnt=0;
+vector<string> analyzeCaboCha(string sentence){
+    vector<string> element;
+    int cnt=0;
     try{
         CaboCha::Parser* parser=CaboCha::createParser("");
-        const CaboCha::Tree *tree=parser->parse(sentence);
+        const CaboCha::Tree *tree=parser->parse(sentence.data());
         for(unsigned int i=0;i<tree->size();i++){
             const CaboCha::Token *token=tree->token(i);
             if(token->chunk){
-                element[cnt++]="$";
-                sprintf(const_cast<char*>(element[cnt++]),"%d",token->chunk->link);
+                element.push_back("$");
+                element.push_back(to_string(token->chunk->link));
             }
-            element[cnt++]="&";
-            element[cnt++]=token->surface;
-            element[cnt++]=getBase(token);
+            element.push_back("&");
+            element.push_back(token->surface);
+            element.push_back(getBase(token));
             for(int j=0;j<=4;j++){
-                element[cnt++]=token->feature_list[j];
+                element.push_back(token->feature_list[j]);
             }
         }
     }catch(exception &ex){
@@ -37,7 +37,7 @@ const char** analyzeCaboCha(char* sentence){
 }
 
 int main(){
-    const char** cabocha=analyzeCaboCha("どうもこんにちは");
+    auto cabocha=analyzeCaboCha("どうもこんにちは");
     for(int i=0;i<100;i++){
         cout<<cabocha[i]<<endl;
     }
