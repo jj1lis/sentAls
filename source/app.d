@@ -1,5 +1,5 @@
 import std.stdio;
-import std.file;
+import std.conv;
 
 import utils.meta;
 import utils.io;
@@ -9,12 +9,10 @@ import context.io;
 import context.calc;
 import context.text;
 
-import include.cabocha;
-
 class input{
-        string[] texts;
-        string[] inputfiles;
-        string outputfile;
+    string[] texts;
+    string[] inputfiles;
+    string outputfile;
 }
 
 void main(string[] args){
@@ -25,37 +23,33 @@ void main(string[] args){
     }catch(Termination t){
         stderr.writeln(t.msg);
         import core.stdc.stdlib;
-        t.isfailure?exit(-1):exit(0);
+
+        int exitcode=t.isfailure?-1:0;
+        writefln("exit code %s\nTerminated.",exitcode);
+        exit(exitcode);
     }
 
-    //Context
-    foreach(fn;args[1..$]){
-        fn.writeln;
-        initFiles(fn);
-        auto filelines=devideFileByLine(fn);
-        foreach(read_text_num;textNums(filelines)){
-            Text text;
-            try{
-                text=new Text(separateText(filelines,read_text_num),read_text_num);
-            }catch(stringToIntException stie){
-                stderr.writeln("error: "~stie.msg);
-            }catch(FileException fe){
-                stderr.writeln("error: "~fe.msg);
-            }catch(NoTextNumberException ntne){
-                stderr.writeln("error: "~ntne.msg);
-            }catch(stringToFloatException stfe){
-                stderr.writeln("error: "~stfe.msg);
-            }catch(ScoreException se){
-                stderr.writeln("error: "~se.msg);
-            }
-
-            text.setScore(calculateTextScore(text));
-            writeText(text);
-            writeAnalysis(text);
-            writeSummary(text);
-
-            debugSpace(text);
+    foreach(read_text_num;0..meta.texts.length.to!int){
+        Text text;
+        auto sents=meta.texts[read_text_num].replaceSymbol.separateSentence;
+        try{
+            text=new Text(sents,read_text_num);
+        }catch(stringToIntException stie){
+            stderr.writeln("error: "~stie.msg);
+        }catch(NoTextNumberException ntne){
+            stderr.writeln("error: "~ntne.msg);
+        }catch(stringToFloatException stfe){
+            stderr.writeln("error: "~stfe.msg);
+        }catch(ScoreException se){
+            stderr.writeln("error: "~se.msg);
         }
+
+        text.score=text.calculateTextScore;
+        writeText(text);
+        writeAnalysis(text);
+        writeSummary(text);
+
+        debugSpace(text);
     }
 }
 
@@ -72,4 +66,32 @@ auto debugSpace(Text target){
         s.write;
     }
     "\n".write;
+}
+
+string replaceSymbol(string text){
+    import std.regex;
+    text=replace(text,regex("!","g"),"！");
+    text=replace(text,regex("?","g"),"？");
+    text=replace(text,regex(",","g"),"、");
+    return text;
+}
+
+string[] separateSentence(string text){
+    string[] sentences;
+    dchar[] tmp_sentence;
+    foreach(c;text.to!(dchar[])){
+        switch(c){
+            case '。':
+                sentences~=(tmp_sentence~c).to!string;
+                tmp_sentence.length=0;
+                break;
+                //
+            default:
+                tmp_sentence~=c;
+        }
+    }
+    if(tmp_sentence.length!=0){
+        sentences~=tmp_sentence.to!string;
+    }
+    return sentences;
 }

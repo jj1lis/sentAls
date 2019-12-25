@@ -1,7 +1,6 @@
 module utils.opt;
 
 import std.stdio;
-import std.datetime;
 
 import utils.exception;
 import utils.meta;
@@ -31,6 +30,7 @@ struct Option{
 }
 
 Option[] separateOption(string[] args){
+    import std.stdio;//DEBUG!!
     string[] tmp_arg;
     Option[] options;
     Opt opt=args[0].argToOption==Opt.unknown?Opt.unknown:args[0].argToOption;
@@ -38,9 +38,11 @@ Option[] separateOption(string[] args){
         if(arg.argToOption!=Opt.unknown){
             if(tmp_arg.length!=0){
                 options~=Option(opt,tmp_arg);
+                writefln("options~=Option(opt,tmp_arg); :tmp_arg %s",tmp_arg);
                 tmp_arg.length=0;
             }else{
                 options~=Option(opt,[]);
+                writefln("options~=Option(opt,[]);");
             }
             opt=arg.argToOption;
         }else{
@@ -105,7 +107,7 @@ void excecute(Option[] opts){
             default:
         }
     }
-    meta=Meta(Clock.currTime,texts,outputfile);
+    meta=Meta(texts,outputfile);
 }
 
 string help(){

@@ -72,7 +72,6 @@ auto writeAnalysis(Text target,string filename=meta.filename~".als"){
             lines~=cast(string)"\t<%sentence:".detab(2)~s.number.to!string~">";
             scope(exit) lines~=cast(string)"\t</sentence>".detab(2);
             lines~=cast(string)"\t\tscore           :".detab(2)~s.score.to!string;
-            lines~=cast(string)"\t\tscore frontstage:".detab(2)~s.scorefront.to!string;
             foreach(p;s.phrases){
                 lines~=cast(string)"\t\t<$phrase:".detab(2)~p.number.to!string~">";
                 scope(exit) lines~=cast(string)"\t\t</phrase>".detab(2);

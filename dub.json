@@ -6,5 +6,6 @@
 	"description": "A minimal D application.",
 	"license": "proprietary",
 	"name": "SentAnalysis",
-    "libs":["cabocha"]
+    "libs":["cabocha","stdc++"],
+    "sourceFiles":["cpp/dependency.o"]
 }

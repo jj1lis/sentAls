@@ -7,6 +7,7 @@ import std.conv;
 import utils.exception;
 import context.pos;
 import context.calc;
+import dependency.analyze;
 
 class Common{
     private int _number;
@@ -15,10 +16,10 @@ class Common{
     private int _dgranpa_number=-1;
 
     @property{
-        int number(){return _number;}
-        int parent_number(){return _parent_number;}
-        int granpa_number(){return _granpa_number;}
-        int dgranpa_number(){return _dgranpa_number;}
+        auto number(){return _number;}
+        auto parent_number(){return _parent_number;}
+        auto granpa_number(){return _granpa_number;}
+        auto dgranpa_number(){return _dgranpa_number;}
     }
 
     this(int number){
@@ -49,34 +50,33 @@ class Word:Common{
     private Poses _poses;
     private int _pos_id;
     private string _base;
+    private string _conjugate_form;
+    private string _conjugate_type;
+    private string _reading;
+    private string _pronunciation;
 
     @property{
         auto morpheme(){return _morpheme;}
         auto poses(){return _poses;}
         auto pos_id(){return _pos_id;}
         auto base(){return _base;}
+        auto conjugate_form(){return _conjugate_form;}
+        auto conjucate_type(){return _conjugate_type;}
+        auto reading(){return _reading;}
+        auto pronunciation(){return _pronunciation;}
     }
 
-    this(string line_word,int number,int phrase_number,int stc_number,int text_number){
-        super(number,phrase_number,stc_number,text_number);
-        if(line_word.length==0){
-            throw new ElementEmptyException(this.number);
-        }
-        auto record=line_word.split(",");
-        _morpheme=record[0];
-        try{
-            _pos_id=to!int(record[1]);
-            _poses=idToPoses(_pos_id);
-        }catch(Exception ex){
-            if(record[1]==""){
-                _pos_id=-1;
-                _poses=Poses(Pos.unknown);
-            }else{
-                throw new stringToIntException(record[1],this.number,
-                        parent_number,granpa_number,dgranpa_number);
-            }
-        }
-        _base=record[2];
+    this(RawWord raw_word,int number,int phrase_number,int sent_number,int text_number){
+        super(number,phrase_number,sent_number,text_number);
+        _morpheme=raw_word.morpheme;
+        _base=raw_word.base;
+        _conjugate_form=raw_word.conjugate_form;
+        _conjugate_type=raw_word.conjucate_type;
+        _reading=raw_word.reading;
+        _pronunciation=raw_word.pronunciation;
+
+        _pos_id=raw_word.raw_pos_id;
+        _poses=idToPoses(this._pos_id);
     }
 
     auto suitable(){
@@ -90,7 +90,7 @@ class Word:Common{
 class Phrase:Common{
     private Word[] _words;
     private int _dependency;
-    private int[] be_depended=new int[0];
+    private int[] be_depended;
     private uint _weight;
 
     @property{
@@ -100,19 +100,14 @@ class Phrase:Common{
         auto weight(uint w){_weight=w;}
     }
 
-    this(string[] line_phrase,int number,int stc_number,int text_number,int depend_to){
-        super(number,stc_number,text_number);
-        if(line_phrase.length==0){
-            throw new ElementEmptyException(this.number);
+    this(RawPhrase raw_phrase,int number,int sent_number,int text_number){
+        super(number,sent_number,text_number);
+        if(raw_phrase.words.length==0){
+            throw new ElementEmptyException(this.number,this.parent_number,this.granpa_number);
         }
-        _dependency=depend_to;
-        _words=new Word[line_phrase.length];
-        foreach(cnt;0..line_phrase.length.to!int){
-            try{
-                _words[cnt]=new Word(line_phrase[cnt],cnt,this.number,parent_number,granpa_number);
-            }catch(stringToIntException stie){
-                stderr.writeln("error: "~stie.msg);
-            }
+        _dependency=raw_phrase.dependency;
+        foreach(cnt;0..raw_phrase.words.length.to!int){
+            _words~=new Word(raw_phrase.words[cnt],cnt,this.number,this.parent_number,this.granpa_number);
         }
     }
 
@@ -127,49 +122,21 @@ class Phrase:Common{
 
 class Sentence:Common{
     private Phrase[] _phrases;
-    private float score_frontstage;
-    private real score_sentence;
+    private float score_sent;
 
     @property{
         auto phrases(){return _phrases;}
-        auto score(){return score_sentence;}
-        auto score(real scr){score_sentence=scr;}
-        auto scorefront(){return score_frontstage;}
+        auto score(){return score_sent;}
+        auto score(real scr){score_sent=scr;}
     }
 
-    this(string[] line_sentence,float score,int number,int text_number){
+    this(RawPhrase[] raw_phrases,int number,int text_number){
         super(number,text_number);
-        if(line_sentence.length==0){
-            throw new ElementEmptyException(this.number);
+        if(raw_phrases.length==0){
+            throw new ElementEmptyException(this.number,this.parent_number);
         }
-        score_frontstage=score;
-        _phrases=new Phrase[0];
-        string[] tmp_phrase;
-        int cnt_phrase;
-        foreach(cnt;0..line_sentence.length){
-            if(line_sentence[cnt].split(",")[0]!="<$>"){
-                tmp_phrase~=line_sentence[cnt];
-            }else{
-                auto exflag=false;
-                int phrase_number,dependency;
-                try{
-                    phrase_number=line_sentence[cnt].split(',')[1].to!(int);
-                    dependency=line_sentence[cnt].split(',')[2].to!(int);
-                }catch(Exception ex){
-                    exflag=true;
-                    throw new stringToIntException("element in phrase",
-                            cnt_phrase,this.number,parent_number);
-                }
-                if(exflag){
-                    _phrases~=new Phrase(tmp_phrase,cnt_phrase,
-                            this.number,parent_number,-1);
-                }else{
-                    _phrases~=new Phrase(tmp_phrase,phrase_number,
-                            this.number,parent_number,dependency);
-                }
-                tmp_phrase.length=0;
-                cnt_phrase++;
-            }
+        foreach(cnt;0..raw_phrases.length.to!int){
+            _phrases~=new Phrase(raw_phrases[cnt],cnt,this.number,this.parent_number);
         }
 
         foreach(p;_phrases){
@@ -189,41 +156,18 @@ class Text:Common{
     @property{
         auto sentences(){return _sentences;}
         auto score(){return score_text;}
-        auto setScore(real score){
-            //assert(score<=100&&score>=-100);
-            score_text=score;
+        auto score(real scr){
+            score_text=scr;
         }
     }
 
-    this(string[] line_text,int number){
+    this(string[] sents,int number){
         super(number);
-        if(line_text.length==0){
+        if(sents.length==0){
             throw new ElementEmptyException(this.number);
         }
-        _sentences=new Sentence[0];
-        string[] tmp_sentence;
-        int cnt_sentence;
-        foreach(cnt;0..line_text.length){
-            if(line_text[cnt].split(",")[0]!="<%>"){
-                tmp_sentence~=line_text[cnt];
-            }else{
-                float score_sentence;
-                try{
-                    score_sentence=to!float(line_text[cnt].split(",")[1]);
-                }catch(Exception ex){
-                    throw new stringToFloatException(line_text[cnt].split(",")[1],cnt_sentence,this.number);
-                }
-                if(score_sentence<-1.||score_sentence>1.){
-                    throw new ScoreException(-1.,1.,cnt_sentence,this.number);
-                }
-                try{
-                    _sentences~=new Sentence(tmp_sentence,score_sentence,cnt_sentence,this.number);
-                }catch(stringToIntException stie){
-                    stderr.writeln("error: "~stie.msg);
-                }
-                tmp_sentence.length=0;
-                cnt_sentence++;
-            }
+        foreach(cnt;0..sents.length.to!int){
+            _sentences~=new Sentence(sents[cnt].analyzeDependency,cnt,this.number);
         }
     }
 }

@@ -21,8 +21,8 @@ struct Meta{
         auto dicname(){return dicfile;}
         auto dictionary(){return dics;}
     }
-    this(SysTime c,string[] texts,string file){
-        start=c;
+    this(string[] texts,string file){
+        start=Clock.currTime;
         _texts~=texts;
         writefile=file;
         dics=new DicShelf(path~"noun.dic",path~"precaution.dic");

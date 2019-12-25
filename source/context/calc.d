@@ -106,7 +106,7 @@ auto calculateTextScore(Text target){
             sent_score_sum+=phrase_score;
         }
         s.score=sent_score_sum/cast(real)s.phrases.length;
-        text_score_sum+=s.scorefront+s.score;
+        text_score_sum+=s.score;
     }
     return text_score_sum/cast(real)target.sentences.length;
 }
