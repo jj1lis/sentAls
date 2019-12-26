@@ -9,15 +9,9 @@ import context.io;
 import context.calc;
 import context.text;
 
-class input{
-    string[] texts;
-    string[] inputfiles;
-    string outputfile;
-}
-
 void main(string[] args){
     try{ 
-        args[1..$].separateOption.excecute;
+        args[1..$].separateOption.excecuteOption;
     }catch(ArgumentException ae){
         stderr.writeln("error: "~ae.msg);
     }catch(Termination t){
@@ -29,28 +23,28 @@ void main(string[] args){
         exit(exitcode);
     }
 
-    foreach(read_text_num;0..meta.texts.length.to!int){
-        Text text;
-        auto sents=meta.texts[read_text_num].replaceSymbol.separateSentence;
-        try{
-            text=new Text(sents,read_text_num);
-        }catch(stringToIntException stie){
-            stderr.writeln("error: "~stie.msg);
-        }catch(NoTextNumberException ntne){
-            stderr.writeln("error: "~ntne.msg);
-        }catch(stringToFloatException stfe){
-            stderr.writeln("error: "~stfe.msg);
-        }catch(ScoreException se){
-            stderr.writeln("error: "~se.msg);
-        }
+    //foreach(read_text_num;0..meta.texts.length.to!int){
+    //    Text text;
+    //    auto sents=meta.texts[read_text_num].replaceSymbol.separateSentence;
+    //    try{
+    //        text=new Text(sents,read_text_num);
+    //    }catch(stringToIntException stie){
+    //        stderr.writeln("error: "~stie.msg);
+    //    }catch(NoTextNumberException ntne){
+    //        stderr.writeln("error: "~ntne.msg);
+    //    }catch(stringToFloatException stfe){
+    //        stderr.writeln("error: "~stfe.msg);
+    //    }catch(ScoreException se){
+    //        stderr.writeln("error: "~se.msg);
+    //    }
 
-        text.score=text.calculateTextScore;
-        writeText(text);
-        writeAnalysis(text);
-        writeSummary(text);
+    //    text.score=text.calculateTextScore;
+    //    writeText(text);
+    //    writeAnalysis(text);
+    //    writeSummary(text);
 
-        debugSpace(text);
-    }
+    //    debugSpace(text);
+    //}
 }
 
 auto debugSpace(Text target){
@@ -71,7 +65,7 @@ auto debugSpace(Text target){
 string replaceSymbol(string text){
     import std.regex;
     text=replace(text,regex("!","g"),"！");
-    text=replace(text,regex("?","g"),"？");
+    text=replace(text,regex("\?","g"),"？");
     text=replace(text,regex(",","g"),"、");
     return text;
 }
