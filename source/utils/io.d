@@ -12,8 +12,6 @@ auto appendln(R)(R name,const void[] buffer){
     append(name,buffer.to!string~"\n");
 }
 
-auto timestamp=()=>meta.startDateTime.to!string;
-
 auto devideFileByLine(string filename){
     try{
         return readText(filename).splitLines;

@@ -1,4 +1,4 @@
-module utils.meta;
+module utils.various;
 
 import std.datetime;
 
@@ -30,3 +30,31 @@ struct Meta{
 }
 
 Meta meta;
+
+string replaceSymbol(string text){
+    import std.regex;
+    text=replace(text,regex("!","g"),"！");
+    text=replace(text,regex("\?","g"),"？");
+    text=replace(text,regex(",","g"),"、");
+    return text;
+}
+
+string[] separateSentence(string text){
+    string[] sentences;
+    dchar[] tmp_sentence;
+    foreach(c;text.to!(dchar[])){
+        switch(c){
+            case '。':
+                sentences~=(tmp_sentence~c).to!string;
+                tmp_sentence.length=0;
+                break;
+                //
+            default:
+                tmp_sentence~=c;
+        }
+    }
+    if(tmp_sentence.length!=0){
+        sentences~=tmp_sentence.to!string;
+    }
+    return sentences;
+}

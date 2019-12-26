@@ -5,7 +5,7 @@
 	"copyright": "Copyright © 2019, jj1lis",
 	"description": "A minimal D application.",
 	"license": "proprietary",
-	"name": "sentAnalysis",
+	"name": "SentAnalysis",
     "libs":["cabocha","stdc++"],
     "sourceFiles":["cpp/dependency.o"]
 }
