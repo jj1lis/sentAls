@@ -3,7 +3,7 @@ module utils.opt;
 import std.stdio;
 
 import utils.exception;
-import utils.meta;
+import utils.various;
 import utils.io;
 
 enum Opt{
@@ -11,6 +11,7 @@ enum Opt{
     inputfile,
     outputfile,
     help,
+    ver,
     unknown,
 }
 
@@ -60,6 +61,8 @@ Opt argToOption(string arg){
             return Opt.outputfile;
         case "-h":
             return Opt.help;
+        case "-v":
+            return Opt.ver;
             //
         default:
             return Opt.unknown;
@@ -70,6 +73,7 @@ void excecuteOption(Option[] opts){
     string[] texts;
     string[] inputfiles;
     string outputfile;
+    Output outflag=Output.comline;
     foreach(opt;opts){
         switch(opt.option){
             case Opt.unknown:
@@ -97,16 +101,24 @@ void excecuteOption(Option[] opts){
                     throw new ArgumentException("-o: Too many arguments.");
                 }else{
                     outputfile=opt.arg[0];
+                    outflag=Output.file;
                 }
                 break;
             case Opt.help:
                 throw new Termination(help);
+            case Opt.ver:
+                throw new Termination(ver);
             default:
         }
     }
-    meta=Meta(texts,outputfile);
+    meta=Meta(texts,outputfile,outflag);
 }
 
 string help(){
     return "help!";
+}
+
+string ver(){
+    enum VER="sentAnalyzer 0.0.1227 raugh";
+    return VER~"\ncopyright (c) 2019 jj1lis";
 }

@@ -13,33 +13,6 @@ import context.calc;
 import context.text;
 import context.pos;
 
-auto separateText(string[] file_lines,int text_number){
-    string[] tmp_text;
-    int cnt_text;
-    for(int cnt=0;cnt<file_lines.length;cnt++){
-        if(file_lines[cnt].split(",")[0]!="<#>"){
-            tmp_text.length++;
-            tmp_text[cnt_text]=file_lines[cnt];
-            cnt_text++;
-        }else if(to!int(file_lines[cnt].split(",")[1])==text_number){
-            return tmp_text;
-        }else{
-            tmp_text.length=0;
-            cnt_text=0;
-        }
-    }
-    throw new NoTextNumberException(text_number);
-}
-
-auto textNums(string[] filelines){
-    int[] text_nums;
-    foreach(line;filelines){
-        if(line.split(",")[0]=="<#>"){
-            text_nums~=line.split(",")[1].to!int;
-        }
-    }
-    return text_nums;
-}
 auto writeText(Text target,string filename=meta.filename~".ctx"){
     string[] lines;
     {

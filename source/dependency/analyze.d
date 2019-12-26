@@ -1,13 +1,24 @@
 module dependency.analyze;
 
-import std.stdio;
 import std.conv;
 import std.string;
 
 import dependency.link;
 
-auto analyzeDependency(string sent){
-    return sent.wrapedCaboCha;
+RawPhrase[] analyzeDependency(string sentence){
+    import std.algorithm:splitter;
+    import std.array:array;
+    import std.stdio;
+    auto analyzed_raw=sentence.linkCaboCha_cpp.split("|")[1..$-1];
+    RawPhrase[] phrases;
+    foreach(phrase;analyzed_raw.splitter("$").array[1..$]){
+        RawWord[] words=new RawWord[0];
+        foreach(word;phrase.splitter("&").array[1..$]){
+            words~=new RawWord(word);
+        }
+            phrases~=new RawPhrase(phrase[0].to!int,words);
+    }
+        return phrases;
 }
 
 class RawPhrase{
@@ -20,7 +31,7 @@ class RawPhrase{
     }
     this(int _dependency,RawWord[] _words){
         this._dependency=_dependency;
-        this._words=words;
+        this._words=_words;
     }
 }
 
@@ -53,17 +64,22 @@ class RawWord{
         int raw_pos_id(){return _raw_pos_id;}
     }
 
-    this(string _morpheme,string _pos,string _subpos1,string _subpos2,string _subpos3,string _conjugate_form,string _conjugate_type,string _base,string _pronunciation){
-        this._morpheme=_morpheme;
-        this._pos=_pos;
-        this._subpos1=_subpos1;
-        this._subpos2=_subpos2;
-        this._subpos3=_subpos3;
-        this._conjugate_form=_conjugate_form;
-        this._conjugate_type=_conjugate_type;
-        this._base=_base;
-        this._reading=_reading;
-        this._pronunciation=_pronunciation;
+    this(string[] data){
+        this._morpheme=data[0];
+        this._pos=data[1];
+        this._subpos1=data[2];
+        this._subpos2=data[3];
+        this._subpos3=data[4];
+        this._conjugate_form=data[5];
+        this._conjugate_type=data[6];
+        this._base=data[7];
+        if(data.length==10){
+            this._reading=data[8];
+            this._pronunciation=data[9];
+        }else{
+            this._reading="*";
+            this._pronunciation="*";
+        }
         this._raw_pos_id=getRaw_pos_id(_pos,_subpos1,_subpos2,_subpos3);
     }
 

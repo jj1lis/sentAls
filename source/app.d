@@ -22,29 +22,32 @@ void main(string[] args){
         writefln("exit code %s\nTerminated.",exitcode);
         exit(exitcode);
     }
+    if(meta.outflag==Output.file){
+        meta.filename.initFiles;
+    }
 
-    //foreach(read_text_num;0..meta.texts.length.to!int){
-    //    Text text;
-    //    auto sents=meta.texts[read_text_num].replaceSymbol.separateSentence;
-    //    try{
-    //        text=new Text(sents,read_text_num);
-    //    }catch(stringToIntException stie){
-    //        stderr.writeln("error: "~stie.msg);
-    //    }catch(NoTextNumberException ntne){
-    //        stderr.writeln("error: "~ntne.msg);
-    //    }catch(stringToFloatException stfe){
-    //        stderr.writeln("error: "~stfe.msg);
-    //    }catch(ScoreException se){
-    //        stderr.writeln("error: "~se.msg);
-    //    }
+    foreach(read_text_num;0..meta.texts.length.to!int){
+        Text text;
+        auto sents=meta.texts[read_text_num].replaceSymbol.separateSentence;
+        try{
+            text=new Text(sents,read_text_num);
+        }catch(stringToIntException stie){
+            stderr.writeln("error: "~stie.msg);
+        }catch(NoTextNumberException ntne){
+            stderr.writeln("error: "~ntne.msg);
+        }catch(stringToFloatException stfe){
+            stderr.writeln("error: "~stfe.msg);
+        }catch(ScoreException se){
+            stderr.writeln("error: "~se.msg);
+        }
 
-    //    text.score=text.calculateTextScore;
-    //    writeText(text);
-    //    writeAnalysis(text);
-    //    writeSummary(text);
+        text.score=text.calculateTextScore;
+        writeText(text);
+        writeAnalysis(text);
+        writeSummary(text);
 
-    //    debugSpace(text);
-    //}
+        debugSpace(text);
+    }
 }
 
 auto debugSpace(Text target){
