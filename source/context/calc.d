@@ -112,11 +112,12 @@ auto calculateTextScore(Text target){
 }
 
 auto score(Phrase p){
-    real sum;
+    real sum=0;
     int hit_counter;
     foreach(w;p.words){
+        import std.math:isNaN;
         auto word_score=w.getWordScore;
-        if(word_score!=real.nan){
+        if(!word_score.isNaN){
             sum+=word_score;
             hit_counter++;
         }

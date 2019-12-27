@@ -29,7 +29,7 @@ auto writeText(Text target,string filename=meta.filename~".ctx"){
         }
     }
     try{
-        appendln(filename,lines.join("\n"));
+        outputln(filename,lines.join("\n"));
     }catch(FileException fe){
         stderr.writeln("error: "~fe.msg);
     }
@@ -65,7 +65,7 @@ auto writeAnalysis(Text target,string filename=meta.filename~".als"){
         }
     }
     try{
-        appendln(filename,lines.join("\n"));
+        outputln(filename,lines.join("\n"));
     }catch(FileException fe){
         stderr.writeln("error: "~fe.msg);
     }
@@ -74,7 +74,7 @@ auto writeAnalysis(Text target,string filename=meta.filename~".als"){
 auto writeCalcLog(T)(string log,T target,string filename=meta.filename~".log"){
     string type=typeof(target).stringof;
     try{
-        appendln(filename,log~" "~type~" "~target.number.to!string);
+        outputln(filename,log~" "~type~" "~target.number.to!string);
     }catch(FileException fe){
         stderr.writeln("error: "~fe.msg);
     }
@@ -82,7 +82,7 @@ auto writeCalcLog(T)(string log,T target,string filename=meta.filename~".log"){
 
 auto writeCalcLog(string log,string filename=meta.filename~".log"){
     try{
-        appendln(filename,log);
+        outputln(filename,log);
     }catch(FileException fe){
         stderr.writeln("error: "~fe.msg);
     }
@@ -91,7 +91,6 @@ auto writeCalcLog(string log,string filename=meta.filename~".log"){
 auto writeSummary(Text target,string filename=meta.filename~".sum"){
     string[] lines;
     foreach(s;target.sentences){
-        scope(exit) lines~="。";
         foreach(p;s.phrases){
             foreach(w;p.words){
                 lines~=w.morpheme;
@@ -100,7 +99,7 @@ auto writeSummary(Text target,string filename=meta.filename~".sum"){
     }
     lines~=":score->"~target.score.to!string;
     try{
-        appendln(filename,lines.join);
+        outputln(filename,lines.join);
     }catch(FileException fe){
         stderr.writeln("error: "~fe.msg);
     }

@@ -99,7 +99,7 @@ class ScoreException:Exception{
 
 class ArgumentException:Exception{
     this(string reason){
-        super("Invalid argument: "~reason~".");
+        super("Invalid argument: "~reason);
     }
 }
 

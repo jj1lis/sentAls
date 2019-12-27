@@ -8,8 +8,25 @@ import std.conv;
 import utils.various;
 import utils.exception;
 
-auto appendln(R)(R name,const void[] buffer){
-    append(name,buffer.to!string~"\n");
+auto outputln(T)(T filename,string buffer){
+    output(filename,buffer~"\n");
+}
+
+auto output(T)(T filename,string buffer){
+    switch(meta.outflag){
+        case Output.file:
+            append(filename,buffer);
+            break;
+        case Output.stdout:
+            buffer.write;
+            break;
+        case Output.stderr:
+            stderr.write(buffer);
+            break;
+        case Output.none:
+            break;
+        default:
+    }
 }
 
 auto devideFileByLine(string filename){
@@ -19,7 +36,6 @@ auto devideFileByLine(string filename){
         throw new FileException(filename,"failed to open file");
     }
 }
-
 
 //import std.algorithm;
 //auto textNums=(string[] lines)=>lines.filter!((line)=>line.split(",")=="#").map!((line)=>line.split(",").to!int).array();

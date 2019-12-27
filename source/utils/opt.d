@@ -10,6 +10,7 @@ enum Opt{
     text,
     inputfile,
     outputfile,
+    no_output,
     help,
     ver,
     unknown,
@@ -63,6 +64,8 @@ Opt argToOption(string arg){
             return Opt.help;
         case "-v":
             return Opt.ver;
+        case "-n":
+            return Opt.no_output;
             //
         default:
             return Opt.unknown;
@@ -73,7 +76,7 @@ void excecuteOption(Option[] opts){
     string[] texts;
     string[] inputfiles;
     string outputfile;
-    Output outflag=Output.comline;
+    Output outflag=Output.stdout;
     foreach(opt;opts){
         switch(opt.option){
             case Opt.unknown:
@@ -104,6 +107,12 @@ void excecuteOption(Option[] opts){
                     outflag=Output.file;
                 }
                 break;
+            case Opt.no_output:
+                if(opt.arg.length>0){
+                    throw new ArgumentException("-n: This option must be calld without arguments.");
+                }
+                outflag=Output.none;
+                break;
             case Opt.help:
                 throw new Termination(help);
             case Opt.ver:
@@ -119,6 +128,6 @@ string help(){
 }
 
 string ver(){
-    enum VER="sentAnalyzer 0.0.1227 raugh";
+    enum VER="sentAnalyzer 0.1.1228 raugh";
     return VER~"\ncopyright (c) 2019 jj1lis";
 }

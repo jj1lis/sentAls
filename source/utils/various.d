@@ -7,7 +7,9 @@ import utils.io;
 
 enum Output{
     file,
-    comline,//stdout
+    stdout,
+    stderr,
+    none,
 }
 
 struct Meta{
@@ -53,11 +55,10 @@ string[] separateSentence(string text){
     dchar[] tmp_sentence;
     foreach(c;text.to!(dchar[])){
         switch(c){
-            case '。':
+            case '。','？','！':
                 sentences~=(tmp_sentence~c).to!string;
                 tmp_sentence.length=0;
                 break;
-                //
             default:
                 tmp_sentence~=c;
         }
