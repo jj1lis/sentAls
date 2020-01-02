@@ -1,7 +1,5 @@
 module utils.opt;
 
-import std.stdio;
-
 import utils.exception;
 import utils.various;
 import utils.io;
@@ -128,6 +126,6 @@ string help(){
 }
 
 string ver(){
-    enum VER="sentAnalyzer 0.1.1228 raugh";
-    return VER~"\ncopyright (c) 2019 jj1lis";
+    enum VER="0.3 rough";
+    return "sentAnalyzer "~VER~"\ncopyright (c) 2019 jj1lis";
 }

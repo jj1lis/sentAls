@@ -1,7 +1,5 @@
 module context.calc;
 
-import std.conv;
-
 import context.text;
 import context.pos;
 import context.io;
@@ -27,6 +25,8 @@ outer:switch(poses.pos){
                       word_weight[cnt]+=2;
                       break outer;
                   default:
+                      word_weight[cnt]++;
+                      break outer;
               }
           case Pos.adject,Pos.conjunct,Pos.adverb,Pos.rentai:
               word_weight[cnt]++;
@@ -53,25 +53,7 @@ outer:switch(poses.pos){
 }
 
 void weightPhrase(Text target){
-    Word[] words_inText=new Word[0];
-    foreach(Sentence s;target.sentences){
-        foreach(Phrase p;s.phrases){
-            foreach(Word w;p.words){
-                words_inText~=w;
-            }
-        }
-    }
-
-    uint[string] word_weight;
-    foreach(w;words_inText){
-        if(w.suitable in word_weight){
-            word_weight[w.suitable]++;
-        }else{
-            word_weight[w.suitable]=0;
-        }
-    }
-    foreach(w;words_inText){
-    }
+    auto word_weight=target.word_appearance;
 
     foreach(Sentence s;target.sentences){
         foreach(p;s.phrases){
@@ -84,7 +66,7 @@ void weightPhrase(Text target){
             foreach(i;0..p.words.length){
                 phrase_weight+=word_weight[p.words[i].suitable];
             }
-            p.weight(phrase_weight);
+            p.weight=phrase_weight;
         }
     }
 }
@@ -99,6 +81,7 @@ auto calculateTextScore(Text target){
             weights_inSentence~=p.weight;
         }
         foreach(p;s.phrases){
+            p.score=p.phraseScore;
             auto phrase_score=p.score*p.weight.getLankCoeff(weights_inSentence);
             if(p.isNegative){
                 phrase_score*=-1;
@@ -111,7 +94,7 @@ auto calculateTextScore(Text target){
     return text_score_sum/cast(real)target.sentences.length;
 }
 
-auto score(Phrase p){
+auto phraseScore(Phrase p){
     real sum=0;
     int hit_counter;
     foreach(w;p.words){
@@ -158,9 +141,9 @@ enum lankCoeff{
     Dedault=1.,
 }
 
-real getLankCoeff(int weight,int[] weights){
+real getLankCoeff(int weight,const int[] weights){
     import std.algorithm;
-    sort!("a>b")(weights);
+    sort!("a>b")(weights.dup);
     int lank=-1;
     foreach(i;0..cast(int)weights.length){
         if(weight>=weights[i]){
