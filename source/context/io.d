@@ -109,18 +109,18 @@ auto writeSummary(Text target,string filename=meta.filename~".sum"){
     }
 }
 
-auto cursorIdiom(Word[] words){
+auto cursorIdiom(const Word[] words){
     import std.range:iota;
     assert(words.length>0);
-    int head=0;
-    int[] cursor=new int[words.length];
+    size_t head=0;
+    size_t[] cursor=new size_t[words.length];
     cursor[]=-1;
     while(head<words.length){
-        int[] candidates=iota(meta.dictionary.idiom.length.to!int).array;
-        foreach(i;head..words.length.to!int){
+        size_t[] candidates=iota(meta.dictionary.idiom.length).array;
+        foreach(i;head..words.length){
             candidates=searchIdiom(words[head..i+1],candidates);
             if(candidates.length==1){
-                cursor[head..i]=candidates[0];
+                cursor[head..i+1]=candidates[0];
                 continue;
             }else if(candidates.length==0){
                 head=head==i?i+1:i;
@@ -131,10 +131,10 @@ auto cursorIdiom(Word[] words){
     return cursor;
 }
 
-auto searchIdiom(Word[] words,int[] candidates_front){
+auto searchIdiom(const Word[] words,size_t[] candidates_front){
     assert(words.length>0);
     auto str=words.length==1?words[0..1].map!(w=>w.morpheme).array:words[0..$-2].map!(w=>w.morpheme).array~words[$-1].suitable;
-    int[] candidates;
+    size_t[] candidates;
     foreach(l;candidates_front){
         auto dic=meta.dictionary.idiom[l].split(",")[0].split;
         if(dic.length>=str.length&&dic[0..str.length-1].equal(str)){
@@ -144,7 +144,7 @@ auto searchIdiom(Word[] words,int[] candidates_front){
     return candidates;
 }
 
-auto getWordScore(Word word){//TODO
+auto getWordScore(const Word word){//TODO
     import std.string;
     string[] dic;
     real word_score;
@@ -166,7 +166,7 @@ auto getWordScore(Word word){//TODO
     return real.nan;
 }
 
-auto getIdiomScore(int line){
+auto getIdiomScore(size_t line){
     import std.string;
     assert(line<meta.dictionary.idiom.length);
     return meta.dictionary.idiom[line].split(",")[1].to!real;

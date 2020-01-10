@@ -4,9 +4,9 @@ import context.text;
 import context.pos;
 import context.io;
 
-uint[] cursorMainWord(Phrase phrase){
+size_t[] cursorMainWord(const Phrase phrase){
     auto words=phrase.words;
-    uint[] word_weight=new uint[words.length];
+    size_t[] word_weight=new size_t[words.length];
     foreach(cnt;0..words.length-1){
         Poses poses=words[cnt].poses;
 outer:switch(poses.pos){
@@ -35,9 +35,9 @@ outer:switch(poses.pos){
       }
     }
 
-    uint[] weighests;
-    int tmp_weighest;
-    foreach(cnt;0..cast(uint)word_weight.length){
+    size_t[] weighests;
+    size_t tmp_weighest;
+    foreach(cnt;0..word_weight.length){
         if(tmp_weighest<word_weight[cnt]){
             tmp_weighest=word_weight[cnt];
             weighests.length=0;
@@ -94,7 +94,7 @@ auto calculateTextScore(Text target){
     return text_score_sum/cast(real)target.sentences.length;
 }
 
-auto phraseScore(Phrase p){
+auto phraseScore(const Phrase p){
     real sum=0;
     int hit_counter;
     foreach(w;p.words){
@@ -112,7 +112,7 @@ auto phraseScore(Phrase p){
     }
 }
 
-bool isNegative(Phrase p){
+bool isNegative(const Phrase p){
     foreach(w;p.words){
         if(w.isNegative){
             return true;
@@ -121,13 +121,9 @@ bool isNegative(Phrase p){
     return false;
 }
 
-auto isNegative(Word w){//TODO
+auto isNegative(const Word w){//TODO
     switch(w.base){
-        case "ない":
-        case "ず":
-        case "ぬ":
-        case "不":
-        case "無":
+        case "ない","ず","ぬ","不","無","非":
             return true;
         default:
             return false;

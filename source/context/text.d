@@ -171,11 +171,11 @@ class Sentence:Common{
         auto idiom_cursor=words.cursorIdiom;
         assert(idiom_cursor.length==words.length);
         foreach(i;0..words.length-1){
-            words[i].score=idiom_cursor[i]==-1?getWordScore(words[i]):getIdiomScore(i.to!int);
+            words[i].score=idiom_cursor[i]==-1?getWordScore(words[i]):i.getIdiomScore;
             if(idiom_cursor[i]==-1){
                 words[i].score=words[i].getWordScore*(words[i].isNegative?-1:1);
             }else{
-                words[i].score=getIdiomScore(i.to!int);
+                words[i].score=i.getIdiomScore;
             }
         }
     }
