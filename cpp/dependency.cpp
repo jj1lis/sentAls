@@ -5,12 +5,6 @@
 #include <cstdio>
 using namespace std;
 
-//const char* getBase(const CaboCha::Token* token) {
-//    if (token->feature_list_size > 6 && token->feature_list[6] != string("*"))
-//        return token->feature_list[6];
-//    return token->surface;
-//}
-
 char* analyzeCaboCha(const char* sentence){
     vector<string> element;
     int cnt=0;
@@ -44,9 +38,3 @@ char* analyzeCaboCha(const char* sentence){
     }
     return result;
 }
-//
-//int main(){
-//    cout<<analyzeCaboCha("こんばんは、だいぶ寒いですね。")<<endl;
-//    //cout<<str<<endl;
-//    return 0;
-//}

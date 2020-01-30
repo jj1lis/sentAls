@@ -122,7 +122,15 @@ void excecuteOption(Option[] opts){
 }
 
 string help(){
-    return "help!";
+    auto msg=new string[];
+    msg~="-h\t\t\t\tShow help.";
+    msg~="-v\t\t\t\tShow version.";
+    msg~="-t [texts...]\t\t\t\tInput texts to analyze from command line.";
+    msg~="-i [input files...]\t\t\t\tSpecify input files."
+    msg~="-o [output file]\t\t\t\tSpecify output file name.";
+    msg~="\t\t\t\tResults are output to stderr by default (-o isn't specified).";
+    msg~="-n\t\t\t\tDo not display output.";
+    return msg;
 }
 
 string ver(){
