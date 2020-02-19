@@ -3,14 +3,16 @@ module utils.io;
 import std.stdio;
 import std.file;
 import std.string;
+import std.conv;
 
 import utils.various;
+import utils.exception;
 
 auto outputln(T)(T filename,string buffer){
     output(filename,buffer~"\n");
 }
 
-auto output(T)(lazy T filename,string buffer){
+auto output(T)(T filename,string buffer){
     switch(meta.outflag){
         case Output.file:
             append(filename,buffer);
@@ -35,6 +37,9 @@ auto devideFileByLine(string filename){
     }
 }
 
+//import std.algorithm;
+//auto textNums=(string[] lines)=>lines.filter!((line)=>line.split(",")=="#").map!((line)=>line.split(",").to!int).array();
+
 auto initFiles(string file){
     try{
         if(exists(file~".ctx")&&isFile(file~".ctx")){
@@ -57,19 +62,17 @@ auto initFiles(string file){
 class DicShelf{
     private string[] _noun;
     private string[] _precaution;
-    private string[] _idiom;
 
     @property{
         string[] noun(){return _noun;}
-        string[] precaution(){return _precaution;}
-        string[] idiom(){return _idiom;}
+        string[] adject(){return _precaution;}
+        string[] verb(){return _precaution;}
     }
 
-    this(string noundic,string predic,string idiomdic){
+    this(string noundic,string predic){
         try{
             _noun=devideFileByLine(noundic);
             _precaution=devideFileByLine(predic);
-            _idiom=devideFileByLine(idiomdic);
         }catch(FileException fe){
             stderr.writeln("error: can't open Dictionary. :"~fe.msg);
         }

@@ -1,11 +1,12 @@
 module context.text;
 
-import std.conv:to;
-import std.algorithm;
-import std.array;
+import std.stdio;
+import std.string;
+import std.conv;
 
 import utils.exception;
 import context.pos;
+import context.calc;
 import dependency.analyze;
 
 class Common{
@@ -13,20 +14,12 @@ class Common{
     private int _parent_number=-1;
     private int _granpa_number=-1;
     private int _dgranpa_number=-1;
-    private real _score=0;
-
-    invariant(_number>=-1);
-    invariant(_parent_number>=-1);
-    invariant(_granpa_number>=-1);
-    invariant(_dgranpa_number>=-1);
 
     @property{
         auto number(){return _number;}
         auto parent_number(){return _parent_number;}
         auto granpa_number(){return _granpa_number;}
         auto dgranpa_number(){return _dgranpa_number;}
-        auto score(){return _score;}
-        auto score(real scr){_score=scr;}
     }
 
     this(int number){
@@ -116,9 +109,6 @@ class Phrase:Common{
         foreach(cnt;0..raw_phrase.words.length.to!int){
             _words~=new Word(raw_phrase.words[cnt],cnt,this.number,this.parent_number,this.granpa_number);
         }
-        if(_words.length==0){
-            throw new ElementEmptyException(this.number,this.parent_number,this.granpa_number);
-        }
     }
 
     auto enqueueBe_depended(int d){
@@ -132,9 +122,12 @@ class Phrase:Common{
 
 class Sentence:Common{
     private Phrase[] _phrases;
+    private float score_sent;
 
     @property{
         auto phrases(){return _phrases;}
+        auto score(){return score_sent;}
+        auto score(real scr){score_sent=scr;}
     }
 
     this(RawPhrase[] raw_phrases,int number,int text_number){
@@ -146,11 +139,6 @@ class Sentence:Common{
             _phrases~=new Phrase(raw_phrases[cnt],cnt,this.number,this.parent_number);
         }
 
-        setPhrasesDependency;
-        markWordsScore;
-    }
-
-    private auto setPhrasesDependency(){
         foreach(p;_phrases){
             if(p.dependency>=0){
                 _phrases[p.dependency].enqueueBe_depended(p.number);
@@ -159,35 +147,18 @@ class Sentence:Common{
             }
         }
     }
-
-    private auto markWordsScore(){
-        import context.calc;
-        import context.io;
-        Word[] words;
-        foreach(i;0.._phrases.length){
-            words~=_phrases[i].words;
-        }
-        assert(words.length!=0);
-        auto idiom_cursor=words.cursorIdiom;
-        assert(idiom_cursor.length==words.length);
-        foreach(i;0..words.length-1){
-            words[i].score=idiom_cursor[i]==-1?getWordScore(words[i]):i.getIdiomScore;
-            if(idiom_cursor[i]==-1){
-                words[i].score=words[i].getWordScore*(words[i].isNegative?-1:1);
-            }else{
-                words[i].score=i.getIdiomScore;
-            }
-        }
-    }
 }
 
 class Text:Common{
     private Sentence[] _sentences;
-    private uint[string] _word_appearance;
+    private real score_text=0;
 
     @property{
         auto sentences(){return _sentences;}
-        auto word_appearance(){return _word_appearance;}
+        auto score(){return score_text;}
+        auto score(real scr){
+            score_text=scr;
+        }
     }
 
     this(string[] sents,int number){
@@ -198,25 +169,5 @@ class Text:Common{
         foreach(cnt;0..sents.length.to!int){
             _sentences~=new Sentence(sents[cnt].analyzeDependency,cnt,this.number);
         }
-
-        _word_appearance=countWords;
-    }
-
-    private uint[string] countWords(){
-        Word[] words_inText;
-        foreach(s;_sentences){
-            foreach(p;s.phrases){
-                words_inText~=p.words;
-            }
-        }
-        uint[string] word_count;
-        foreach(w;words_inText){
-            if(w.suitable in word_count){
-                word_count[w.suitable]++;
-            }else{
-                word_count[w.suitable]=0;
-            }
-        }
-        return word_count;
     }
 }

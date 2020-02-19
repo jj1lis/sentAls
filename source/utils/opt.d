@@ -1,5 +1,7 @@
 module utils.opt;
 
+import std.stdio;
+
 import utils.exception;
 import utils.various;
 import utils.io;
@@ -122,18 +124,10 @@ void excecuteOption(Option[] opts){
 }
 
 string help(){
-    auto msg=new string[];
-    msg~="-h\t\t\t\tShow help.";
-    msg~="-v\t\t\t\tShow version.";
-    msg~="-t [texts...]\t\t\t\tInput texts to analyze from command line.";
-    msg~="-i [input files...]\t\t\t\tSpecify input files."
-    msg~="-o [output file]\t\t\t\tSpecify output file name.";
-    msg~="\t\t\t\tResults are output to stderr by default (-o isn't specified).";
-    msg~="-n\t\t\t\tDo not display output.";
-    return msg;
+    return "help!";
 }
 
 string ver(){
-    enum VER="0.3 rough";
-    return "sentAnalyzer "~VER~"\ncopyright (c) 2019 jj1lis";
+    enum VER="sentAnalyzer 0.1.1228 raugh";
+    return VER~"\ncopyright (c) 2019 jj1lis";
 }

@@ -1,13 +1,13 @@
 module dependency.analyze;
 
+import std.conv;
+import std.string;
 
 import dependency.link;
 
 RawPhrase[] analyzeDependency(string sentence){
     import std.algorithm:splitter;
     import std.array:array;
-    import std.conv:to;
-    import std.string:split;
     import std.stdio;
     auto analyzed_raw=sentence.linkCaboCha_cpp.split("|")[1..$-1];
     RawPhrase[] phrases;
@@ -83,7 +83,7 @@ class RawWord{
         this._raw_pos_id=getRaw_pos_id(_pos,_subpos1,_subpos2,_subpos3);
     }
 
-    private int getRaw_pos_id(string pos,lazy string subpos1,lazy string subpos2,lazy string subpos3){
+    private int getRaw_pos_id(string pos,string subpos1,string subpos2,string subpos3){
         if(pos=="その他"){
             if(subpos1=="間投"){
                 return 0;

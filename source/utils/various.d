@@ -36,7 +36,7 @@ struct Meta{
         _texts~=texts;
         writefile=file;
         this.output_flag=output_flag;
-        dics=new DicShelf(path~"noun.dic",path~"precaution.dic",path~"idiom.dic");
+        dics=new DicShelf(path~"noun.dic",path~"precaution.dic");
     }
 }
 
