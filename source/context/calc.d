@@ -4,7 +4,7 @@ import context.text;
 import context.pos;
 import context.io;
 
-size_t[] cursorMainWord(const Phrase phrase){
+size_t[] cursorMainWord(Phrase phrase){
     auto words=phrase.words;
     size_t[] word_weight=new size_t[words.length];
     foreach(cnt;0..words.length-1){
@@ -94,7 +94,7 @@ auto calculateTextScore(Text target){
     return text_score_sum/cast(real)target.sentences.length;
 }
 
-auto phraseScore(const Phrase p){
+auto phraseScore(Phrase p){
     real sum=0;
     int hit_counter;
     foreach(w;p.words){
@@ -112,7 +112,7 @@ auto phraseScore(const Phrase p){
     }
 }
 
-bool isNegative(const Phrase p){
+bool isNegative(Phrase p){
     foreach(w;p.words){
         if(w.isNegative){
             return true;
@@ -121,7 +121,7 @@ bool isNegative(const Phrase p){
     return false;
 }
 
-auto isNegative(const Word w){//TODO
+auto isNegative(Word w){//TODO
     switch(w.base){
         case "ない","ず","ぬ","不","無","非":
             return true;

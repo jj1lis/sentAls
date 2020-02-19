@@ -109,7 +109,7 @@ auto writeSummary(Text target,string filename=meta.filename~".sum"){
     }
 }
 
-auto cursorIdiom(const Word[] words){
+auto cursorIdiom(Word[] words){
     import std.range:iota;
     assert(words.length>0);
     size_t head=0;
@@ -131,7 +131,7 @@ auto cursorIdiom(const Word[] words){
     return cursor;
 }
 
-auto searchIdiom(const Word[] words,size_t[] candidates_front){
+auto searchIdiom(Word[] words,size_t[] candidates_front){
     assert(words.length>0);
     auto str=words.length==1?words[0..1].map!(w=>w.morpheme).array:words[0..$-2].map!(w=>w.morpheme).array~words[$-1].suitable;
     size_t[] candidates;
@@ -144,7 +144,7 @@ auto searchIdiom(const Word[] words,size_t[] candidates_front){
     return candidates;
 }
 
-auto getWordScore(const Word word){//TODO
+auto getWordScore(Word word){//TODO
     import std.string;
     string[] dic;
     real word_score;

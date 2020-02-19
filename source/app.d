@@ -11,6 +11,9 @@ import context.text;
 
 void main(string[] args){
     try{ 
+        if(args.length==1){
+            throw new ArgumentException("Specify arguments.");
+        }
         args[1..$].separateOption.excecuteOption;
     }catch(ArgumentException ae){
         stderr.writeln("error: "~ae.msg);
