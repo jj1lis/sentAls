@@ -33,9 +33,15 @@ $ git clone https://github.com/jj1lis/sentAls.git
 ```
 
 ### Before using
-Build project by **DUB**: package manager for D package.
-Move to the root directory of this project and execute following:
+Compile the part written in C++. Move to sentAls/cpp.
+```bash
+$ cd cpp/
+$ g++ -c dependecy.cpp
 ```
+
+Build project by **DUB**: package manager for D package.
+Move to the root directory (sentAls/) and execute following:
+```bash
 $ dub build
 ```
 Refer to https://code.dlang.org if you don't have.
