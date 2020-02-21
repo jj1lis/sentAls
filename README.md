@@ -9,6 +9,12 @@ This is Sentiment Classification Analyzer for Japanese. "Sentiment classificatio
 is the degree to which text is positive or negative terms in the emotion and impression.
 sentAls analyzes morpheme, syntax, and dependency that text includes and calculates its classification as score from them.
 
+## Dependencies
+sentAls depends and is confirmed its motion following environments and libraries.
+- dlang: dmd v2.090.0 over (https://dlang.org/)
+- cabocha: cabocha of 0.69 (https://taku910.github.io/cabocha/)
+- Japanese Sentiment Polarity Dictionary: Natural Language Processing Lab (Inui-Suzuki Lab), Tohoku University (https://www.cl.ecei.tohoku.ac.jp/index.php?Open%20Resources/Japanese%20Sentiment%20Polarity%20Dictionary)
+
 ## Feedback
 contact me at:
 - issues on Github
