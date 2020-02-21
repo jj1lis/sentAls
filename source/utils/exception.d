@@ -135,11 +135,17 @@ class ElementEmptyException:Exception{
     }
 }
 
-class Termination:Exception{
-    private bool failure;
-    @property bool isfailure(){return failure;}
-    this(string msg,bool failure=false){
-        this.failure=failure;
+class NoInputException:Exception{
+    this(string msg){
         super(msg);
     }
 }
+//
+//class Termination:Exception{
+//    private bool failure;
+//    @property bool isfailure(){return failure;}
+//    this(string msg,bool failure=false){
+//        this.failure=failure;
+//        super(msg);
+//    }
+//}

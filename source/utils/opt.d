@@ -32,17 +32,15 @@ struct Option{
 }
 
 Option[] separateOption(string[] args){
+    auto isAlone=(Opt opt)=>opt==Opt.ver||opt==Opt.help;
+
     string[] tmp_arg;
     Option[] options;
-    Opt opt=args[0].argToOption==Opt.unknown?Opt.unknown:args[0].argToOption;
-    foreach(arg;args){
+    Opt opt=args[0].argToOption;
+    foreach(arg;args[1..$]){
         if(arg.argToOption!=Opt.unknown){
-            if(tmp_arg.length!=0){
-                options~=Option(opt,tmp_arg);
-                tmp_arg.length=0;
-            }else if(options.length!=0){
-                options~=Option(opt,[]);
-            }
+            options~=Option(opt,tmp_arg);
+            tmp_arg.length=0;
             opt=arg.argToOption;
         }else{
             tmp_arg~=arg;
@@ -72,19 +70,22 @@ Opt argToOption(string arg){
     }
 }
 
-void excecuteOption(Option[] opts){
+bool executeOption(Option[] opts){
     string[] texts;
     string[] inputfiles;
     string outputfile;
     Output outflag=Output.stdout;
+    bool continue_flag,outputflag;
+
     foreach(opt;opts){
         switch(opt.option){
             case Opt.unknown:
-                throw new ArgumentException("Unknown Option.");
+                throw new ArgumentException("Unknown option included.");
             case Opt.text:
                 if(opt.arg.length==0){
                     throw new ArgumentException("-t: Specify text.");
                 }else{
+                    continue_flag=true;
                     texts~=opt.arg;
                 }
                 break;
@@ -92,6 +93,7 @@ void excecuteOption(Option[] opts){
                 if(opt.arg.length==0){
                     throw new ArgumentException("-i: Specify input filename.");
                 }else{
+                    continue_flag=true;
                     foreach(file;opt.arg){
                         texts~=file.devideFileByLine;
                     }
@@ -103,6 +105,7 @@ void excecuteOption(Option[] opts){
                 }else if(opt.arg.length>1){
                     throw new ArgumentException("-o: Too many arguments.");
                 }else{
+                    outputflag=true;
                     outputfile=opt.arg[0];
                     outflag=Output.file;
                 }
@@ -114,13 +117,20 @@ void excecuteOption(Option[] opts){
                 outflag=Output.none;
                 break;
             case Opt.help:
-                throw new Termination(help);
+                help.writeln;
+                break;
             case Opt.ver:
-                throw new Termination(ver);
+                ver.writeln;
+                break;
             default:
         }
     }
+    if(!continue_flag&&outputflag){
+        throw new NoInputException("-o: Output file is specified even though text isn't input.");
+    }
+
     meta=Meta(texts,outputfile,outflag);
+    return continue_flag;
 }
 
 string help(){
@@ -128,6 +138,6 @@ string help(){
 }
 
 string ver(){
-    enum VER="sentAnalyzer 0.1.1228 raugh";
-    return VER~"\ncopyright (c) 2019 jj1lis";
+    enum VER="Sentiment Classification Analyzer 0.1.0221 raugh";
+    return VER~"\ncopyright (c) 2019-2020 jj1lis";
 }

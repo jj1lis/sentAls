@@ -1,4 +1,5 @@
 import std.stdio;
+import std.file:FileException;
 import std.conv;
 
 import utils.various;
@@ -10,43 +11,52 @@ import context.calc;
 import context.text;
 
 void main(string[] args){
+    bool continue_flag;
     try{ 
-        args[1..$].separateOption.excecuteOption;
+        continue_flag=args[1..$].separateOption.executeOption;
     }catch(ArgumentException ae){
         stderr.writeln("error: "~ae.msg);
-    }catch(Termination t){
-        stderr.writeln(t.msg);
-        import core.stdc.stdlib;
+    }catch(FileException fe){
+        stderr.writeln("error: "~fe.msg);
+    }catch(NoInputException nie){
+        stderr.writeln("error: "~nie.msg);
+    }/*catch(Termination t){
+       stderr.writeln(t.msg);
+       import core.stdc.stdlib;
 
-        int exitcode=t.isfailure?-1:0;
-        writefln("exit code %s\nTerminated.",exitcode);
-        exit(exitcode);
-    }
-    if(meta.outflag==Output.file){
-        meta.filename.initFiles;
-    }
+       int exitcode=t.isfailure?-1:0;
+       writefln("exit code %s\nTerminated.",exitcode);
+       exit(exitcode);
+       }*/
 
-    foreach(read_text_num;0..meta.texts.length.to!int){
-        Text text;
-        auto sents=meta.texts[read_text_num].replaceSymbol.separateSentence;
-        try{
-            text=new Text(sents,read_text_num);
-        }catch(stringToIntException stie){
-            stderr.writeln("error: "~stie.msg);
-        }catch(NoTextNumberException ntne){
-            stderr.writeln("error: "~ntne.msg);
-        }catch(stringToFloatException stfe){
-            stderr.writeln("error: "~stfe.msg);
-        }catch(ScoreException se){
-            stderr.writeln("error: "~se.msg);
+    if(continue_flag){
+
+        if(meta.outflag==Output.file){
+            meta.filename.initFiles;
         }
 
-        text.score=text.calculateTextScore;
-        writeText(text);
-        writeAnalysis(text);
-        writeSummary(text);
+        foreach(read_text_num;0..meta.texts.length.to!int){
+            Text text;
+            auto sents=meta.texts[read_text_num].replaceSymbol.separateSentence;
+            try{
+                text=new Text(sents,read_text_num);
+            }catch(stringToIntException stie){
+                stderr.writeln("error: "~stie.msg);
+            }catch(NoTextNumberException ntne){
+                stderr.writeln("error: "~ntne.msg);
+            }catch(stringToFloatException stfe){
+                stderr.writeln("error: "~stfe.msg);
+            }catch(ScoreException se){
+                stderr.writeln("error: "~se.msg);
+            }
 
-        debugSpace(text);
+            text.score=text.calculateTextScore;
+            writeText(text);
+            writeAnalysis(text);
+            writeSummary(text);
+
+            debugSpace(text);
+        }
     }
 }
 

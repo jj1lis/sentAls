@@ -6,9 +6,9 @@ import context.text;
 import context.pos;
 import context.io;
 
-uint[] cursorMainWord(Phrase phrase){
+size_t[] cursorMainWord(Phrase phrase){
     auto words=phrase.words;
-    uint[] word_weight=new uint[words.length];
+    int[] word_weight=new int[words.length];
     foreach(cnt;0..words.length-1){
         Poses poses=words[cnt].poses;
 outer:switch(poses.pos){
@@ -27,6 +27,8 @@ outer:switch(poses.pos){
                       word_weight[cnt]+=2;
                       break outer;
                   default:
+                      word_weight[cnt]++;
+                      break outer;
               }
           case Pos.adject,Pos.conjunct,Pos.adverb,Pos.rentai:
               word_weight[cnt]++;
@@ -35,9 +37,9 @@ outer:switch(poses.pos){
       }
     }
 
-    uint[] weighests;
+    size_t[] weighests;
     int tmp_weighest;
-    foreach(cnt;0..cast(uint)word_weight.length){
+    foreach(cnt;0..word_weight.length){
         if(tmp_weighest<word_weight[cnt]){
             tmp_weighest=word_weight[cnt];
             weighests.length=0;
@@ -62,7 +64,7 @@ void weightPhrase(Text target){
         }
     }
 
-    uint[string] word_weight;
+    size_t[string] word_weight;
     foreach(w;words_inText){
         if(w.suitable in word_weight){
             word_weight[w.suitable]++;
@@ -80,11 +82,11 @@ void weightPhrase(Text target){
             }
         }
         foreach(p;s.phrases){
-            uint phrase_weight;
+            int phrase_weight;
             foreach(i;0..p.words.length){
                 phrase_weight+=word_weight[p.words[i].suitable];
             }
-            p.weight(phrase_weight);
+            p.weight=phrase_weight;
         }
     }
 }
@@ -99,19 +101,19 @@ auto calculateTextScore(Text target){
             weights_inSentence~=p.weight;
         }
         foreach(p;s.phrases){
-            auto phrase_score=p.score*p.weight.getLankCoeff(weights_inSentence);
+            p.score=p.rawscore*p.weight.getLankCoeff(weights_inSentence)/p.words.length;
             if(p.isNegative){
-                phrase_score*=-1;
+                p.score=p.score*-1;
             }
-            sent_score_sum+=phrase_score;
+            sent_score_sum+=p.score;
         }
         s.score=sent_score_sum/cast(real)s.phrases.length;
         text_score_sum+=s.score;
     }
-    return text_score_sum/cast(real)target.sentences.length;
+    return 100*text_score_sum/cast(real)target.sentences.length;
 }
 
-auto score(Phrase p){
+auto rawscore(Phrase p){
     real sum=0;
     int hit_counter;
     foreach(w;p.words){
@@ -122,11 +124,7 @@ auto score(Phrase p){
             hit_counter++;
         }
     }
-    if(hit_counter!=0){
-        return sum/cast(real)hit_counter;
-    }else{
-        return 0;
-    }
+    return hit_counter!=0?sum/cast(real)hit_counter:0;
 }
 
 bool isNegative(Phrase p){
@@ -144,6 +142,7 @@ auto isNegative(Word w){//TODO
         case "ず":
         case "ぬ":
         case "不":
+        case "非":
         case "無":
             return true;
         default:
@@ -151,20 +150,21 @@ auto isNegative(Word w){//TODO
     }
 }
 
-enum lankCoeff{
-    first=3.,
-    second=2,
-    third=1.5,
-    Dedault=1.,
-}
 
 real getLankCoeff(int weight,int[] weights){
+    enum lankCoeff{
+        first=3.,
+        second=2,
+        third=1.5,
+        Dedault=1.,
+    }
+
     import std.algorithm;
     sort!("a>b")(weights);
     int lank=-1;
-    foreach(i;0..cast(int)weights.length){
+    foreach(i;0..weights.length){
         if(weight>=weights[i]){
-            lank=i;
+            lank=i.to!int;
             break;
         }
     }

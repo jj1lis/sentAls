@@ -19,7 +19,6 @@ char* analyzeCaboCha(const char* sentence){
             }
             element.push_back("&");
             element.push_back(token->surface);
-            //element.push_back(getBase(token));
             for(int j=0;j<token->feature_list_size;j++){
                 element.push_back(token->feature_list[j]);
             }

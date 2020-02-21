@@ -60,21 +60,24 @@ auto initFiles(string file){
 }
 
 class DicShelf{
-    private string[] _noun;
-    private string[] _precaution;
+    private:
+        string[] _noun;
+        string[] _precaution;
 
-    @property{
-        string[] noun(){return _noun;}
-        string[] adject(){return _precaution;}
-        string[] verb(){return _precaution;}
-    }
+    public:
 
-    this(string noundic,string predic){
-        try{
-            _noun=devideFileByLine(noundic);
-            _precaution=devideFileByLine(predic);
-        }catch(FileException fe){
-            stderr.writeln("error: can't open Dictionary. :"~fe.msg);
+        @property{
+            string[] noun(){return _noun;}
+            string[] adject(){return _precaution;}
+            string[] verb(){return _precaution;}
         }
-    }
+
+        this(string noundic,string predic){
+            try{
+                _noun=devideFileByLine(noundic);
+                _precaution=devideFileByLine(predic);
+            }catch(FileException fe){
+                stderr.writeln("error: can't open Dictionary. :"~fe.msg);
+            }
+        }
 }

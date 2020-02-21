@@ -3,9 +3,9 @@
 		"jj1lis"
 	],
 	"copyright": "Copyright © 2019, jj1lis",
-	"description": "A minimal D application.",
+	"description": "Sentiment Classification Analyzer",
 	"license": "proprietary",
-	"name": "SentAnalysis",
+	"name": "analyzer_sentclass",
     "libs":["cabocha","stdc++"],
     "sourceFiles":["cpp/dependency.o"]
 }
