@@ -3,9 +3,12 @@ module context.weighting;
 import std.algorithm;
 import std.conv:to;
 
-real weighting(int weight, int[] weightlist);
-
-real weighting(int weight,int[] weights){
+real weighting(int weight,const int[] _weightlist)in{
+    assert(_weightlist.length!=0);
+}out(result){
+    assert(result!=real.nan);
+}do{
+    auto weightlist=_weightlist.dup;
     enum lankCoeff{
         first=3.,
         second=2,
@@ -13,22 +16,17 @@ real weighting(int weight,int[] weights){
         Dedault=1.,
     }
 
-    sort!("a>b")(weights);
-    int lank=-1;
-    foreach(i;0..weights.length){
-        if(weight>=weights[i]){
+    sort!("a>b")(weightlist);
+    int lank=int.max;
+    foreach(i;0..weightlist.length){
+        if(weight>=weightlist[i]){
             lank=i.to!int;
             break;
         }
     }
-    switch(lank){
-        case 1:
-            return lankCoeff.first;
-        case 2:
-            return lankCoeff.second;
-        case 3:
-            return lankCoeff.third;
-        default:
-            return lankCoeff.Dedault;
-    }
+
+    return correctFunc(lank/weightlist.length);
 }
+
+//example
+@safe @nogc nothrow pure real function(real) correctFunc=(x)=>1+1/x;
