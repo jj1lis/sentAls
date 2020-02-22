@@ -10,16 +10,23 @@ import context.io;
 import context.calc;
 import context.text;
 
+void writeErr(Exception ex){
+    stderr.writeln("\033[1m\033[33merror\033[0m\033[1m: "~ex.msg);
+}
+
 void main(string[] args){
     bool continue_flag;
     try{ 
+        if(args.length<2){
+            throw new ArgumentException("No arguments.");
+        }
         continue_flag=args[1..$].separateOption.executeOption;
     }catch(ArgumentException ae){
-        stderr.writeln("error: "~ae.msg);
+        writeErr(ae);
     }catch(FileException fe){
-        stderr.writeln("error: "~fe.msg);
+        writeErr(fe);
     }catch(NoInputException nie){
-        stderr.writeln("error: "~nie.msg);
+        writeErr(nie);
     }/*catch(Termination t){
        stderr.writeln(t.msg);
        import core.stdc.stdlib;
