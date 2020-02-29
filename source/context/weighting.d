@@ -19,13 +19,17 @@ real weighting(int weight,const int[] _weightlist)in{
             break;
         }
     }
-    //import std.stdio;
+    if(lank==int.max)lank=weightlist.length.to!int;
 
-    //writefln("lank=%s %s:weightlist.length=%s %s:lank/weightlist.length.to!real=%s %s\ncorrectFunc(lank/weightlist.length.to!real)=%s %s",typeof(lank).stringof,lank,typeof(weightlist.length).stringof,weightlist.length,typeof(lank/weightlist.length.to!real).stringof,lank/weightlist.length.to!real,typeof(correctFunc(lank/weightlist.length.to!real)).stringof,correctFunc(lank/weightlist.length.to!real));
-    return correctFunc(lank/weightlist.length.to!real);
-    //if(result.isNaN||result.isInfinity)assert(0);
-    //return result;
+    return correctFunc(lank,weightlist.length);
 }
 
 //example
-@safe @nogc nothrow pure real function(real) correctFunc=(x)=>1+1/x;
+
+import utils.various;
+
+@safe @nogc nothrow real correctFunc(int lank,size_t len){
+    real width=1/len.to!real;
+    real lpl=lank*(1/(len.to!real+1));    //lank per length
+    return pow(meta.weight_base,lpl-1);
+}

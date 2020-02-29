@@ -41,12 +41,15 @@ void main(string[] args){
         if(meta.outflag==Output.file){
             meta.filename.initFiles;
         }
+        
+        Text[] texts;
 
         foreach(read_text_num;0..meta.texts.length.to!int){
-            Text text;
+            //Text text;
             auto sents=meta.texts[read_text_num].replaceSymbol.separateSentence;
             try{
-                text=new Text(sents,read_text_num);
+                //text=new Text(sents,read_text_num);
+                texts~=new Text(sents,read_text_num);
             }catch(stringToIntException stie){
                 stderr.writeln("error: "~stie.msg);
             }catch(NoTextNumberException ntne){
@@ -57,14 +60,40 @@ void main(string[] args){
                 stderr.writeln("error: "~se.msg);
             }
 
-            text.score=text.calculateTextScore;
-            writeText(text);
-            writeAnalysis(text);
-            writeSummary(text);
+            //text.score=text.calculateTextScore;
+            //writeText(text);
+            //writeAnalysis(text);
+            //writeSummary(text);
 
-            debugSpace(text);
+            //debugSpace(text);
         }
+        debugSpace2(texts);
     }
+}
+
+auto debugSpace2(Text[] texts){
+    "debugSpace2 called".writeln;
+    import std.file,std.algorithm,std.array;
+    append(meta.filename~".csv","a,b,score1,score2,....\n");
+    string[] results;
+    string func(real base){
+        meta.weight_base=base;
+        writefln("base==%s",base);
+        texts.each!(text=>text.score=text.calculateTextScore);
+        texts.each!(text=>text.score.writeln);
+        auto base_=meta.weight_base.to!string;
+        auto score=texts.map!(text=>text.score.to!string).join(",");
+        return base_~","~score;
+    }
+
+    import std.range;
+    func(1./5.);
+    "other case".writeln;
+    foreach(base;iota(10000).map!(i=>(1/10001.)*(i+1))){
+        func(base);
+    }
+    append(meta.filename~".csv",results.join("\n"));
+
 }
 
 auto debugSpace(Text target){

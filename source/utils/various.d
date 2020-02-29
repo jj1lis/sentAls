@@ -25,6 +25,11 @@ struct Meta{
 
     public:
 
+        real weight_base=0.5;
+
+        invariant(0<weight_base&&weight_base<1);
+
+
         @property{
             auto startTime(){return start;}
             auto startDateTime(){return cast(DateTime)start;}

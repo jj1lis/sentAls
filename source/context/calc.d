@@ -108,7 +108,20 @@ auto calculateTextScore(Text target){
             }
             sent_score_sum+=p.score;
         }
-        s.score=sent_score_sum/cast(real)s.phrases.length;
+        import utils.various,std.math;
+        auto base=meta.weight_base;
+        real integral=(1-1/base)/log(base)+1;
+        /*
+           integral(0_1) correctFunc(x) dx
+          =integral(0_1) {base^(x-1)+1} dx
+          =[base^(x-1) / log(base) + x](0_1)
+          =(base^0 / log(base) + 1) - (base^(-1) / log(base))
+          =( 1 - base^(-1) ) / log(base) + 1
+          =( 1 - 1/base ) / log(base) + 1 ---QED.
+        */
+        //s.score=sent_score_sum/integral/s.phrases.length;
+        s.score=sent_score_sum/s.phrases.length;
+
         text_score_sum+=s.score;
     }
     return 100*text_score_sum/cast(real)target.sentences.length;
