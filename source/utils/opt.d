@@ -1,12 +1,13 @@
 module utils.opt;
 
 import std.stdio;
+import std.range;
 
-import utils.exception;
-import utils.various;
-import utils.io;
+import utils;
 
-enum Opt{
+@safe:
+
+enum OptType{
     text,
     inputfile,
     outputfile,
@@ -16,90 +17,111 @@ enum Opt{
     unknown,
 }
 
+bool isHelperOptType(OptType ot){
+    switch(ot){
+        case OptType.help,OptType.ver:
+            return true;
+        default:
+            return false;
+    }
+}
+
+O to(O)(string arg)if(is(O==OptType)){
+    switch(arg){
+        case "-t":
+            return OptType.text;
+        case "-i":
+            return OptType.inputfile;
+        case "-o":
+            return OptType.outputfile;
+        case "-h":
+            return OptType.help;
+        case "-v":
+            return OptType.ver;
+        case "-n":
+            return OptType.no_output;
+            //
+        default:
+            return OptType.unknown;
+    }
+}
+
 struct Option{
-    private Opt opt;
+    private OptType opt;
     private string[] args;
 
     @property{
-        Opt option(){return opt;}
+        inout OptType opttype(){return opt;}
         string[] arg(){return args;}
     }
 
-    this(Opt opt,string[] args){
+    this(OptType opt,string[] args){
         this.opt=opt;
         this.args=args;
     }
 }
 
-Option[] separateOption(string[] args){
-    auto isAlone=(Opt opt)=>opt==Opt.ver||opt==Opt.help;
+auto separateOption(R)(const R args)if(isRandomAccessRange!R&&is(ElementType!R==string)){
+
+    assert(args.length>0);
 
     string[] tmp_arg;
     Option[] options;
-    Opt opt=args[0].argToOption;
-    foreach(arg;args[1..$]){
-        if(arg.argToOption!=Opt.unknown){
-            options~=Option(opt,tmp_arg);
-            tmp_arg.length=0;
-            opt=arg.argToOption;
-        }else{
-            tmp_arg~=arg;
+    OptType opt=args[0].to!OptType;
+
+    if(args.length>1){
+        foreach(arg;args[1..$]){
+            if(arg.to!OptType!=OptType.unknown){
+                options~=Option(opt,tmp_arg);
+                tmp_arg.length=0;
+                opt=arg.to!OptType;
+            }else{
+                tmp_arg~=arg;
+            }
         }
     }
     options~=Option(opt,tmp_arg);
     return options;
 }
 
-Opt argToOption(string arg){
-    switch(arg){
-        case "-t":
-            return Opt.text;
-        case "-i":
-            return Opt.inputfile;
-        case "-o":
-            return Opt.outputfile;
-        case "-h":
-            return Opt.help;
-        case "-v":
-            return Opt.ver;
-        case "-n":
-            return Opt.no_output;
-            //
-        default:
-            return Opt.unknown;
-    }
+bool isMainProcessExecuted(R)(const R opts)if(isRandomAccessRange!R&&is(ElementType!R==Option)){
+    foreach(opt;opts)
+        if(opt.opttype.isHelperOptType||opt.opttype==OptType.unknown)
+            return false;
+
+    return true;
 }
 
-bool executeOption(Option[] opts){
+@system void executeOption(Option[] opts){
     string[] texts;
     string[] inputfiles;
     string outputfile;
-    Output outflag=Output.stdout;
-    bool continue_flag,outputflag;
+    Output out_destination=Output.stdout;
+    bool inputflag,outputflag;
 
     foreach(opt;opts){
-        switch(opt.option){
-            case Opt.unknown:
+        switch(opt.opttype){
+            case OptType.unknown:
                 throw new ArgumentException("Unknown option included.");
-            case Opt.text:
+            case OptType.text:
                 if(opt.arg.length==0){
                     throw new ArgumentException("-t: Specify text.");
                 }else{
-                    continue_flag=true;
+                    inputflag=true;
                     texts~=opt.arg;
                 }
                 break;
-            case Opt.inputfile:
+            case OptType.inputfile:
                 if(opt.arg.length==0){
                     throw new ArgumentException("-i: Specify input filename.");
                 }else{
-                    continue_flag=true;
+                    inputflag=true;
                     foreach(file;opt.arg){
                         texts~=file.devideFileByLine;
                     }
                 }
                 break;
-            case Opt.outputfile:
+            case OptType.outputfile:
                 if(opt.arg.length==0){
                     throw new ArgumentException("-o: Specify output filename.");
                 }else if(opt.arg.length>1){
@@ -107,30 +129,29 @@ bool executeOption(Option[] opts){
                 }else{
                     outputflag=true;
                     outputfile=opt.arg[0];
-                    outflag=Output.file;
+                    out_destination=Output.file;
                 }
                 break;
-            case Opt.no_output:
+            case OptType.no_output:
                 if(opt.arg.length>0){
                     throw new ArgumentException("-n: This option must be calld without arguments.");
                 }
-                outflag=Output.none;
+                out_destination=Output.none;
                 break;
-            case Opt.help:
+            case OptType.help:
                 help.writeln;
-                break;
-            case Opt.ver:
+                return;
+            case OptType.ver:
                 ver.writeln;
-                break;
+                return;
             default:
         }
     }
-    if(!continue_flag&&outputflag){
+    if(!inputflag&&outputflag){
         throw new NoInputException("-o: Output file is specified even though text isn't input.");
     }
 
-    meta=Meta(texts,outputfile,outflag);
-    return continue_flag;
+    meta=Meta(texts,out_destination,outputfile);
 }
 
 string help(){

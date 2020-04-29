@@ -3,36 +3,38 @@ module dependency.analyze;
 import std.conv;
 import std.string;
 
-import dependency.link;
+import dependency;
 
-RawPhrase[] analyzeDependency(string sentence){
+@system RawPhrase[] analyzeDependency(const string sentence){
     import std.algorithm:splitter;
     import std.array:array;
     import std.stdio;
-    auto analyzed_raw=sentence.linkCaboCha_cpp.split("|")[1..$-1];
+    auto analyzed_raw=sentence.dup.linkCaboCha_cpp.split("|")[1..$-1];
     RawPhrase[] phrases;
     foreach(phrase;analyzed_raw.splitter("$").array[1..$]){
         RawWord[] words;
         foreach(word;phrase.splitter("&").array[1..$]){
             words~=new RawWord(word);
         }
-        phrases~=new RawPhrase(phrase[0].to!int,words);
+        phrases~=new RawPhrase(phrase[0].to!size_t,words);
     }
     return phrases;
 }
 
+@safe:
+
 class RawPhrase{
     private:
-        int _dependency;
+        size_t _dependency;
         RawWord[] _words;
 
     public:
         invariant(_dependency>=-1);
         @property{
-            int dependency(){return _dependency;}
+            size_t dependency(){return _dependency;}
             RawWord[] words(){return _words;}
         }
-        this(int _dependency,RawWord[] _words){
+        this(size_t _dependency,RawWord[] _words){
             this._dependency=_dependency;
             this._words=_words;
         }
@@ -50,7 +52,7 @@ class RawWord{
         string _base;
         string _reading;
         string _pronunciation;
-        int _raw_pos_id;
+        size_t _raw_pos_id;
 
     public:
 
@@ -67,7 +69,7 @@ class RawWord{
             string base(){return _base;}
             string reading(){return _reading;}
             string pronunciation(){return _pronunciation;}
-            int raw_pos_id(){return _raw_pos_id;}
+            size_t raw_pos_id(){return _raw_pos_id;}
         }
 
         this(string[] data){
@@ -90,7 +92,7 @@ class RawWord{
             this._raw_pos_id=getRaw_pos_id(_pos,_subpos1,_subpos2,_subpos3);
         }
 
-        private int getRaw_pos_id(string pos,string subpos1,string subpos2,string subpos3){
+        private size_t getRaw_pos_id(string pos,string subpos1,string subpos2,string subpos3){
             if(pos=="その他"){
                 if(subpos1=="間投"){
                     return 0;

@@ -1,5 +1,7 @@
 module context.pos;
 
+@safe:
+
 enum Pos{
     other,
     filler,
@@ -189,7 +191,7 @@ struct Poses{
     }
 }
 
-auto idToPoses(int id){
+P to(P)(size_t id)if(is(P==Poses)){
     switch(id){
         case Pos_id.other:
             return Poses(Pos.other);

@@ -5,15 +5,20 @@ import std.file;
 import std.string;
 import std.conv;
 
-import utils.various;
-import utils.exception;
+import utils;
+
+@system:
+
+void writeError(Exception ex,string type="error"){
+    stderr.writeln("\033[1m\033[33m"~type~"\033[0m\033[1m: "~ex.msg);
+}
 
 auto outputln(T)(T filename,string buffer){
     output(filename,buffer~"\n");
 }
 
 auto output(T)(T filename,string buffer){
-    switch(meta.outflag){
+    switch(meta.outputdestination){
         case Output.file:
             append(filename,buffer);
             break;
@@ -29,7 +34,7 @@ auto output(T)(T filename,string buffer){
     }
 }
 
-auto devideFileByLine(string filename){
+@safe auto devideFileByLine(string filename){
     try{
         return readText(filename).splitLines;
     }catch(FileException fe){

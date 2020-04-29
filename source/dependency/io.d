@@ -7,6 +7,8 @@ import std.conv;
 
 import utils.io;
 
+@safe:
+
 auto getTexts(string filename){
     return devideFileByLine(filename);
 }

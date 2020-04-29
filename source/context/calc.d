@@ -2,12 +2,11 @@ module context.calc;
 
 import std.conv;
 
-import context.text;
-import context.pos;
-import context.io;
-import context.weighting;
+import context;
 
-size_t[] cursorMainWord(Phrase phrase){
+@system:
+
+@safe size_t[] cursorMainWord(Phrase phrase){
     auto words=phrase.words;
     int[] word_weight=new int[words.length];
     foreach(cnt;0..words.length-1){
@@ -141,7 +140,7 @@ auto rawscore(Phrase p){
     return hit_counter!=0?sum/cast(real)hit_counter:0;
 }
 
-bool isNegative(Phrase p){
+@safe bool isNegative(Phrase p){
     foreach(w;p.words){
         if(w.isNegative){
             return true;
@@ -150,7 +149,7 @@ bool isNegative(Phrase p){
     return false;
 }
 
-auto isNegative(Word w){//TODO
+@safe auto isNegative(Word w){//TODO
     switch(w.base){
         case "ない":
         case "ず":

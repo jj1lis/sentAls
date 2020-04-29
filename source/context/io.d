@@ -13,7 +13,9 @@ import context.calc;
 import context.text;
 import context.pos;
 
-auto writeText(Text target,string filename=meta.filename~".ctx"){
+@system:
+
+auto writeText(Text target,string filename=meta.outputfilename~".ctx"){
     string[] lines;
     {
         scope(exit) lines~="<#>,"~to!string(target.number)~","~target.score.to!string;
@@ -35,7 +37,7 @@ auto writeText(Text target,string filename=meta.filename~".ctx"){
     }
 }
 
-auto writeAnalysis(Text target,string filename=meta.filename~".als"){
+auto writeAnalysis(Text target,string filename=meta.outputfilename~".als"){
     string[] lines;
     {
         lines~="<#text:"~target.number.to!string~">";
@@ -71,7 +73,7 @@ auto writeAnalysis(Text target,string filename=meta.filename~".als"){
     }
 }
 
-auto writeCalcLog(T)(string log,T target,string filename=meta.filename~".log"){
+auto writeCalcLog(T)(string log,T target,string filename=meta.outputfilename~".log"){
     string type=typeof(target).stringof;
     try{
         outputln(filename,log~" "~type~" "~target.number.to!string);
@@ -80,7 +82,7 @@ auto writeCalcLog(T)(string log,T target,string filename=meta.filename~".log"){
     }
 }
 
-auto writeCalcLog(string log,string filename=meta.filename~".log"){
+auto writeCalcLog(string log,string filename=meta.outputfilename~".log"){
     try{
         outputln(filename,log);
     }catch(FileException fe){
@@ -88,7 +90,7 @@ auto writeCalcLog(string log,string filename=meta.filename~".log"){
     }
 }
 
-auto writeSummary(Text target,string filename=meta.filename~".sum"){
+auto writeSummary(Text target,string filename=meta.outputfilename~".sum"){
     string[] lines;
     foreach(s;target.sentences){
         foreach(p;s.phrases){

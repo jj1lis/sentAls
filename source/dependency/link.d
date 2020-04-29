@@ -5,7 +5,8 @@ import std.conv:to;
 
 extern(C++) char* analyzeCaboCha(const char* sentence);
 
-string linkCaboCha_cpp(string sentence){
+@system:
+
+string linkCaboCha_cpp(const string sentence){
     return analyzeCaboCha(sentence.toStringz).to!string;
 }
-
