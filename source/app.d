@@ -31,11 +31,9 @@ void main(string[] args){
         
         Text[] texts;
 
-        foreach(read_text_num;0..meta.texts.length.to!int){
-            //Text text;
+        foreach(read_text_num;0..meta.texts.length){
             auto sents=meta.texts[read_text_num].replaceSymbol.separateSentence;
             try{
-                //text=new Text(sents,read_text_num);
                 texts~=new Text(sents,read_text_num);
             }catch(stringToIntException stie){
                 writeError(stie);
@@ -49,12 +47,6 @@ void main(string[] args){
                 writeError(eee);
             }
 
-            //text.score=text.calculateTextScore;
-            //writeText(text);
-            //writeAnalysis(text);
-            //writeSummary(text);
-
-            //debugSpace(text);
         }
         debugSpace2(texts);
     }

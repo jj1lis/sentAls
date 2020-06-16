@@ -17,7 +17,7 @@ enum OptType{
     unknown,
 }
 
-bool isHelperOptType(OptType ot){
+bool isHelperOptType(const OptType ot){
     switch(ot){
         case OptType.help,OptType.ver:
             return true;
@@ -26,7 +26,7 @@ bool isHelperOptType(OptType ot){
     }
 }
 
-O to(O)(string arg)if(is(O==OptType)){
+O to(O)(const string arg)if(is(O==OptType)){
     switch(arg){
         case "-t":
             return OptType.text;
@@ -92,7 +92,7 @@ bool isMainProcessExecuted(R)(const R opts)if(isRandomAccessRange!R&&is(ElementT
     return true;
 }
 
-@system void executeOption(Option[] opts){
+@system void executeOption(const Option[] opts){
     string[] texts;
     string[] inputfiles;
     string outputfile;
@@ -154,11 +154,42 @@ bool isMainProcessExecuted(R)(const R opts)if(isRandomAccessRange!R&&is(ElementT
     meta=Meta(texts,out_destination,outputfile);
 }
 
-string help(){
-    return "help!";
+enum help(){
+    return "
+    usage: sent-als [<option> <arg>...]...
+
+    Option List
+
+        -t      Input texts directly.
+                args are raw Japanese texts.
+                you can specify multiple texts (separate with a half-width space.)
+                    e.g.: sent-als -t おはようございます。今日もいい天気ですね。 昨日の新聞は読みましたか？
+                        Texts of this example are separated as following:
+                            - \"おはようございます。今日もいい天気ですね。\"
+                            - \"昨日の新聞は読みましたか？\"
+
+        -i      Input texts from specified files.
+                args are filenames (you can specify multiple files.)
+                    e.g.: sent-als -i sample1 sample2 sample3
+
+        -o      Specify file written the analysis result.
+                arg is filename (you can specify only one file.)
+                    e.g.: sent-als -o result.txt
+                The result'll be emitted to stdout if you don't specify the output file.
+
+        -n      Don't emit the result.
+                The result isn't written to file nor display to stdout.
+                You can specify no arguments.
+                    e.g.: sent-als -n
+                
+        -h      Display the help.
+
+        -v      Display the version information.
+
+    Multiple options can be specified.";
 }
 
-string ver(){
-    enum VER="Sentiment Classification Analyzer 0.1.0221 raugh";
-    return VER~"\ncopyright (c) 2019-2020 jj1lis";
+//TODO
+enum ver(){
+    return "Sentiment Classification Analyzer 0.1.0221 raugh\nFinal Built on "~__DATE__~"\ncopyright (c) 2019-2020 jj1lis";
 }

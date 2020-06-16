@@ -9,15 +9,15 @@ import utils;
 
 @system:
 
-void writeError(Exception ex,string type="error"){
+void writeError(const Exception ex, const string type="error"){
     stderr.writeln("\033[1m\033[33m"~type~"\033[0m\033[1m: "~ex.msg);
 }
 
-auto outputln(T)(T filename,string buffer){
+auto outputln(T)(const T filename,const string buffer){
     output(filename,buffer~"\n");
 }
 
-auto output(T)(T filename,string buffer){
+auto output(T)(const T filename,const string buffer){
     switch(meta.outputdestination){
         case Output.file:
             append(filename,buffer);
@@ -34,7 +34,7 @@ auto output(T)(T filename,string buffer){
     }
 }
 
-@safe auto devideFileByLine(string filename){
+@safe auto devideFileByLine(const string filename){
     try{
         return readText(filename).splitLines;
     }catch(FileException fe){
@@ -42,10 +42,7 @@ auto output(T)(T filename,string buffer){
     }
 }
 
-//import std.algorithm;
-//auto textNums=(string[] lines)=>lines.filter!((line)=>line.split(",")=="#").map!((line)=>line.split(",").to!int).array();
-
-auto initFiles(string file){
+auto initFiles(const string file){
     try{
         if(exists(file~".ctx")&&isFile(file~".ctx")){
             remove(file~".ctx");
