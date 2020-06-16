@@ -176,4 +176,7 @@ class Sentence:Common{
             sents.length.iota.
                 each!(i=>_sentences~=new Sentence(sents[i].analyzeDependency,i,this.number));
         }
+//        unittest{
+//            "そういえば、あなたのお父さんはどちらにお勤めですか？".analyzeDependency;
+//        }
 }

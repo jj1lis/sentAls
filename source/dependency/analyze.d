@@ -9,32 +9,37 @@ import dependency;
     import std.algorithm:splitter;
     import std.array:array;
     import std.stdio;
-    auto analyzed_raw=sentence.dup.linkCaboCha_cpp.split("|")[1..$-1];
+    auto analyzed_raw=sentence.dup.linkCaboCha_cpp.split("|")[1..$];
     RawPhrase[] phrases;
     foreach(phrase;analyzed_raw.splitter("$").array[1..$]){
         RawWord[] words;
         foreach(word;phrase.splitter("&").array[1..$]){
             words~=new RawWord(word);
         }
-        phrases~=new RawPhrase(phrase[0].to!size_t,words);
+        phrases~=new RawPhrase(phrase[0].to!long,words);
     }
     return phrases;
+}
+
+unittest{
+    import std;
+    "毎度おなじみ流浪の番組、タモリ倶楽部でございます。".linkCaboCha_cpp.writeln;
 }
 
 @safe:
 
 class RawPhrase{
     private:
-        size_t _dependency;
+        long _dependency;
         RawWord[] _words;
 
     public:
         invariant(_dependency>=-1);
         @property{
-            size_t dependency(){return _dependency;}
+            long dependency(){return _dependency;}
             RawWord[] words(){return _words;}
         }
-        this(size_t _dependency,RawWord[] _words){
+        this(long _dependency,RawWord[] _words){
             this._dependency=_dependency;
             this._words=_words;
         }

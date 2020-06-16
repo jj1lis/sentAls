@@ -52,7 +52,7 @@ struct Option{
 
     @property{
         inout OptType opttype(){return opt;}
-        string[] arg(){return args;}
+        inout string[] arg(){return args.dup;}
     }
 
     this(OptType opt,string[] args){
