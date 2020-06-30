@@ -5,8 +5,10 @@
 #include <cstdio>
 using namespace std;
 
-char* analyzeCaboCha(const char* sentence){
-    vector<string> element;
+//TODO
+
+const char* analyzeCaboCha(const char* sentence){
+    basic_string<char> result;
     int cnt=0;
     try{
         auto parser=CaboCha::createParser("");
@@ -14,26 +16,19 @@ char* analyzeCaboCha(const char* sentence){
         for(unsigned int i=0;i<tree->size();i++){
             auto token=tree->token(i);
             if(token->chunk){
-                element.push_back("$");
-                element.push_back(to_string(token->chunk->link));
+                result+="$";
+                result+=to_string(token->chunk->link);
             }
-            element.push_back("&");
-            element.push_back(token->surface);
+            result+="&";
+            result+=token->surface;
             for(int j=0;j<token->feature_list_size;j++){
-                element.push_back(token->feature_list[j]);
+                result+=token->feature_list[j];
+                result+=(j==token->feature_list_size-1?"":"|");
             }
         }
     }catch(exception &ex){
         cerr<<ex.what()<<endl;
     }
-    string als;
-    for(int j=0;j<element.size();j++){
-        als+="|";
-        als+=element[j];
-    }
-    char* result=new char[als.length()];
-    for(int k=0;k<als.length();k++){
-        result[k]=als[k];
-    }
-    return result;
+
+    return result.data();
 }
