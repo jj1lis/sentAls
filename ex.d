@@ -1,13 +1,11 @@
 import std;
 
+extern(C++)void cpptest();
+
 void main(){
+    cpptest;
 }
 
 unittest{
-    disp;
-    writeln("test");
-}
-
-void disp(){
-    "disp".writeln;
+    cpptest;
 }

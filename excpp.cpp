@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 using namespace std;
-int main(){
+void cpptest(){
     string a="hogehoge";
     cout<<"size:"<<a.length()<<endl;
     auto cp=a.data();
