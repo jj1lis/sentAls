@@ -1,13 +1,13 @@
 #include <cabocha.h>
 #include <iostream>
 #include <string>
-#include <vector>
-#include <cstdio>
 using namespace std;
 
 //TODO
 
-const char* analyzeCaboCha(const char* sentence){
+//test
+//string analyzeCaboCha(const char* sentence){
+char* analyzeCaboCha(const char* sentence){
     basic_string<char> result;
     int cnt=0;
     try{
@@ -21,6 +21,7 @@ const char* analyzeCaboCha(const char* sentence){
             }
             result+="&";
             result+=token->surface;
+            result+="|";
             for(int j=0;j<token->feature_list_size;j++){
                 result+=token->feature_list[j];
                 result+=(j==token->feature_list_size-1?"":"|");
@@ -30,5 +31,20 @@ const char* analyzeCaboCha(const char* sentence){
         cerr<<ex.what()<<endl;
     }
 
-    return result.data();
+    auto returner=new char[result.size()];
+    for(size_t i;i<result.size();i++)
+        returner[i]=result[i];
+    return returner;
+    
+    //return result.data();
+
+    //test
+    //return result;
 }
+
+//test
+//int main(){
+//    cout<<"*****CaboCha result******";
+//    cout<<analyzeCaboCha("今日も一日頑張ります").data()<<endl;
+//    return 0;
+//}

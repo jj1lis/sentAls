@@ -5,35 +5,36 @@ import std.string;
 
 import dependency;
 
-//@system RawPhrase[] analyzeDependency(const string sentence){
-//    import std.algorithm:splitter;
-//    import std.array:array;
-//    import std.stdio;
-//    auto analyzed_raw=sentence.dup.linkCaboCha_cpp.split("|")[1..$];
-//    RawPhrase[] phrases;
-//    foreach(phrase;analyzed_raw.splitter("$").array[1..$]){
-//        RawWord[] words;
-//        foreach(word;phrase.splitter("&").array[1..$]){
-//            words~=new RawWord(word);
-//        }
-//        phrases~=new RawPhrase(phrase[0].to!long,words);
-//    }
-//    return phrases;
-//}
-
 @system RawPhrase[] analyzeDependency(const string sentence){
     import std.algorithm:splitter;
     import std.array:array;
     import std.stdio;
+    auto analyzed_raw=sentence.dup.linkCaboCha_cpp.split("|")[1..$];
     RawPhrase[] phrases;
-    return sentence.linkCaboCha_cpp.splitter("$").removeFront.map!(words=>
-            new RawPhrase(words.splitter("&").front.to!long,words.splitter("&").removeFront.))//TODO
+    foreach(phrase;analyzed_raw.splitter("$").array[1..$]){
+        RawWord[] words;
+        foreach(word;phrase.splitter("&").array[1..$]){
+            words~=new RawWord(word);
+        }
+        phrases~=new RawPhrase(phrase[0].to!long,words);
+    }
+    return phrases;
 }
 
-unittest{
-    import std;
-    "毎度おなじみ流浪の番組、タモリ倶楽部でございます。".linkCaboCha_cpp.writeln;
-}
+//@system RawPhrase[] analyzeDependency(const string sentence){
+//    import std.algorithm:splitter;
+//    import std.array:array;
+//    import std.stdio;
+//    return sentence.linkCaboCha_cpp.splitter("$").removeFront.map!(words=>
+//            new RawPhrase(words.splitter("&").front.to!long,words.splitter("&").removeFront.));
+//}
+
+//unittest{
+//    import std;
+//    enum test="毎度おなじみ流浪の番組、タモリ倶楽部でございます。";
+//    test.writeln;
+//    test.linkCaboCha_cpp.writeln;
+//}
 
 @safe:
 
