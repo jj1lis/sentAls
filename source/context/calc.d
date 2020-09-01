@@ -9,7 +9,7 @@ import context;
 @safe size_t[] cursorMainWord(Phrase phrase){
     auto words=phrase.words;
     int[] word_weight=new int[words.length];
-    foreach(cnt;0..words.length-1){
+    foreach(cnt;0..words.length){
         Poses poses=words[cnt].poses;
 outer:switch(poses.pos){
           case Pos.verb:
@@ -47,8 +47,6 @@ outer:switch(poses.pos){
         }else if(tmp_weighest==word_weight[cnt]){
             weighests~=cnt;
         }
-    }
-    foreach(i;weighests){
     }
 
     return weighests;
@@ -92,6 +90,7 @@ void weightPhrase(Text target){
 }
 
 auto calculateTextScore(Text target){
+    //TODO
     real text_score_sum=0;
     weightPhrase(target);
     foreach(s;target.sentences){
@@ -116,7 +115,7 @@ auto calculateTextScore(Text target){
           =[base^(x-1) / log(base) + x](0_1)
           =(base^0 / log(base) + 1) - (base^(-1) / log(base))
           =( 1 - base^(-1) ) / log(base) + 1
-          =( 1 - 1/base ) / log(base) + 1 ---QED.
+          =( 1 - 1/base ) / log(base) + 1 ---
         */
         //s.score=sent_score_sum/integral/s.phrases.length;
         s.score=sent_score_sum/s.phrases.length;
@@ -141,12 +140,14 @@ auto rawscore(Phrase p){
 }
 
 @safe bool isNegative(Phrase p){
+    bool isNeg;
     foreach(w;p.words){
         if(w.isNegative){
-            return true;
+            isNeg=!isNeg;
         }
     }
-    return false;
+
+    return isNeg;
 }
 
 @safe auto isNegative(Word w){//TODO

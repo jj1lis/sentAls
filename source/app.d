@@ -48,7 +48,7 @@ void main(string[] args){
             }
 
         }
-        debugSpace2(texts);
+        //debugSpace2(texts);
     }
 }
 

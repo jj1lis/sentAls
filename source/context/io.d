@@ -107,6 +107,8 @@ auto writeSummary(Text target,string filename=meta.outputfilename~".sum"){
     }
 }
 
+//TODO
+//use string search and an. idioms.
 auto getWordScore(Word word){
     string[] dic;
     real word_score;

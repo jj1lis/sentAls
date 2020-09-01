@@ -88,8 +88,6 @@ class Word:Common{
 class Phrase:Common{
     private:
         Word[] _words;
-        size_t _dependency;
-        size_t[] be_depended;
         int _weight;
         real score_phrase;
 
@@ -97,11 +95,12 @@ class Phrase:Common{
 
         @property{
             auto words(){return _words;}
-            auto dependency(){return _dependency;}
             auto weight(){return _weight;}
             auto weight(int w){_weight=w;}
             auto score(){return score_phrase;}
             auto score(real s){score_phrase=s;}
+
+            //operate from Class Sentence
         }
 
         this(RawPhrase raw_phrase,size_t number,size_t sent_number,size_t text_number){
@@ -109,30 +108,26 @@ class Phrase:Common{
             if(raw_phrase.words.length==0){
                 throw new ElementEmptyException(this.number,this.parent_number,this.granpa_number);
             }
-            _dependency=raw_phrase.dependency;
             raw_phrase.words.length.iota.
                 each!(i=>_words~=new Word(raw_phrase.words[i],i,this.number,this.parent_number,this.granpa_number));
         }
-
-        auto enqueueBe_depended(size_t d){
-            be_depended~=d;
-        }
-
-        auto getBe_depended(){
-            return be_depended;
-        }
 }
+
 
 class Sentence:Common{
     private:
         Phrase[] _phrases;
         real score_sent;
+        size_t[] dependency_table;
 
     public:
+        invariant(dependency_table.length==_phrases.length);
+
         @property{
             auto phrases(){return _phrases;}
             auto score(){return score_sent;}
             auto score(real scr){score_sent=scr;}
+            auto deptable(){return dependency_table;}
         }
 
         this(RawPhrase[] raw_phrases,size_t number,size_t text_number){
@@ -143,13 +138,11 @@ class Sentence:Common{
             raw_phrases.length.iota.
                 each!(i=>_phrases~=new Phrase(raw_phrases[i],i,this.number,this.parent_number));
 
-            foreach(p;_phrases){
-                if(p.dependency>=0){
-                    _phrases[p.dependency].enqueueBe_depended(p.number);
-                }else{
-                    assert(p.dependency==inf!size_t);
-                }
-            }
+            raw_phrases.each!(p=>dependency_table~=(p.dependency>=0?p.dependency.to!size_t:inf!size_t));
+        }
+
+        void combinePhrases(R)(R _phrases)if(isRandomAccessRange!R || is(ElementType!R == size_t)){
+            //TODO
         }
 }
 
@@ -163,20 +156,23 @@ class Sentence:Common{
         @property{
             auto sentences(){return _sentences;}
             auto score(){return score_text;}
-            auto score(real scr){
-                score_text=scr;
-            }
         }
 
-        this(const string[] sents,size_t number){
-            super(number);
+        this(const string[] sents,size_t number)in{
             if(sents.length==0){
                 throw new ElementEmptyException(this.number);
             }
+            }body{
+            super(number);
             sents.length.iota.
                 each!(i=>_sentences~=new Sentence(sents[i].analyzeDependency,i,this.number));
+
+            this.score_text=context.calc.calculateTextScore(this);
         }
+
+
 //        unittest{
 //            "そういえば、あなたのお父さんはどちらにお勤めですか？".analyzeDependency;
 //        }
+
 }
