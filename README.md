@@ -19,7 +19,6 @@ sentAls depends and is confirmed its motion following environments and libraries
 contact me at:
 - [issues](https://github.com/jj1lis/sentAls/issues) on Github
 - email: rinta.nambuline205@gmail.com
-- (twitter: [@_SIL1JJ](https://twitter.com/_SIL1JJ))
 
 ## about research
 - name: jj1lis
